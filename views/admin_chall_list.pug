@@ -1,0 +1,70 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        meta(name="author", content="ch4n3")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-small-business/css/small-business.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+            .container
+                a.navbar-brand(href="/") H3X0R CTF
+                button.navbar-toggler(type="button",data-toggle="collapse",data-target="#navbarResponsive",aria-controls="navbarResponsive",aria-expanded="false",aria-label="Toggle navigation")
+                    span.navbar-toggler-icon
+                div#navbarResponsive.collapse.navbar-collapse
+                    ul.navbar-nav.ml-auto
+                        li.nav-item.active
+                            a.nav-link(href="/challenge") Home
+                                span.sr-only (current)
+                        each category in categorys
+                            li.nav-item
+                                a.nav-link(href="#" + category.toLowerCase()) #{category}
+        
+        div.container
+            //- div.row.my-4
+            //-     div.col-lg-8
+            //-         img.img-fluid.rounded(src="http://placehold.it/900x400")
+
+            //-     div.col-lg-4
+            //-         h1 Business Name or Tagline
+            //-         p This is a template that is great for small businesses. It doesn't have too much fancy flare to it, but it makes a great use of the standard Bootstrap core components. Feel free to use this template for any project you want!
+            //-         a.btn.btn-primary.btn-lg(href="#") Call to Action!
+
+
+
+            each category in categorys
+                div#pwn.card.text-white.bg-secondary.my-4.text-center
+                    div(id=category)
+                        div.card-body
+                            p.text-white.m-0 
+                                h2 #{category}
+                    
+                div.row
+                    each challenge in challenges
+                        if challenge.category == category
+                                div.div.col-md-4.mb-4
+                                    div.card.h-100
+                                        div.card-body
+                                            h2.card-title #{challenge.title}
+                                            p.card-text 
+                                                | author : #{challenge.author}
+                                                br
+                                                | point : #{challenge.point}
+                                                br
+                                                | solvers : #{challenge.solvers}
+                                        div.card-footer
+                                            a.btn.btn-primary(href="/secretjuju/challenge/" + challenge.no) Modify
+                    br                   
+            br
+            div.div.row
+                a.btn.btn-info(href="/secretjuju/createChallenge", role="button") 
+                    | Create Challenge
+            br
+
+        footer.py-5.bg-dark
+            div.container
+                p.m-0.text-center.text-white Copyright &copy; ch4n3 2018
+                

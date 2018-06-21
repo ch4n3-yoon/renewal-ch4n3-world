@@ -1,0 +1,42 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", rel="stylesheet")
+        script(src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    body
+        .container 
+            h1 H3X0R CTF 
+            hr
+
+            h2.display-1 #{title}
+            blockquote
+                div.mb-0 !{description}
+                footer #{author}
+            br
+            br
+            
+            
+            if files
+                label Files
+                each file in files
+                    p 
+                        a(href="/uploads/" + no + "/" + file)= file
+
+
+            br
+            br
+
+            form.form-group(action="/challenge/" + no + "/auth", method="post")
+                label Flag
+                .row
+                    .col-md-8
+                        input.form-control(name="flag") 
+                    .col-md-4
+                        button.btn(type="submit" value="") Flag Check
+            br
+            a.btn.btn-primary(href="/challenge") list
+            

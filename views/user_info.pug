@@ -1,0 +1,38 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        .container
+            .page-content-wrapper
+                .container-fluid
+                    h1 Some info for #{nickname}
+                    table.table
+                        tr
+                            th # 
+                            th title
+                            th Solved time
+                            th Rank
+                        
+                        - var index = 1
+                        each allChallenge in allChallenges
+                            tr 
+                                td #{index}
+                                td #{allChallenge.title}
+                                - index++;
+                                - var check = 0;
+                                each solvedChallenge in solvedChallenges
+                                    if solvedChallenge.no == allChallenge.no
+                                        td #{solvedChallenge.solvetime}
+                                        td #{solvedChallenge.rank}
+                                        - check = 1;
+
+                                if check == 0
+                                    td 😪
+                                    td 😪
+                                    

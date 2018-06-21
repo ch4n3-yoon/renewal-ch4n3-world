@@ -1,0 +1,43 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            #sidebar-wrapper 
+                ul.sidebar-nav
+                    li.sidebar-brand
+                        a(href="/") H3X0R CTF
+                    li
+                        a(href="/rank") Rank
+                    li
+                        a(href="/challenge") Challenges
+                    
+                    //- 로그인하지 않았을 때
+                    if isLogin == 0
+                        li
+                            a(href="/login") Login & Register
+                    else 
+                        li 
+                            a(href="/logout") Logout
+
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 H3X0R CTF
+                    P 이 사이트는 헥서의 ch4n3이 갈리고 갈려서 만들어지게 된 사이트입니다. 보신다면 R.I.P를 댓글로 남겨주세요
+                    P Make sure to keep all page content within the 
+                        code #page-content-wrapper
+                        |.
+                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
+                              
+        script(type="text/javascript")
+            | $("#menu-toggle").click(function(e) {
+            |  e.preventDefault();
+            |  $("#wrapper").toggleClass("toggled");
+            | });

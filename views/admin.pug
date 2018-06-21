@@ -1,0 +1,27 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title Admin Page
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            include admin_sidebar.pug
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 H3X0R CTF admin site
+                    P H3X0R 팀을 위한 관리자 페이지입니다. 해당 페이지에서는 문제 출제, 문제 관리, 사용자 관리, IP관리, DB설정 등이 가능합니다. 
+                    P Make sure to keep all page content within the 
+                        code #page-content-wrapper
+                        |.
+                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
+                              
+        script(type="text/javascript")
+            | $("#menu-toggle").click(function(e) {
+            |  e.preventDefault();
+            |  $("#wrapper").toggleClass("toggled");
+            | });

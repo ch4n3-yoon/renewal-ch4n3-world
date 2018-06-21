@@ -1,0 +1,81 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", rel="stylesheet")
+        script(src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+        style
+            include admin_chall_view.css
+    body
+        .container 
+
+            h1 H3X0R CTF Managing Page
+            br
+            br
+            div.hr-sect PREVIEW
+
+            h3= title
+            pre!= description
+        
+
+            div.hr
+
+            br
+            br
+            br
+
+            form(action="/secretjuju/challenge/" + challenge.no, method="post",  enctype="multipart/form-data")
+                div.form-group
+                    label Title
+                    input.form-control(type="text", value=challenge.title, name="title")
+                div.form-group
+                    lable Category
+                    input.form-control(type="text", value=challenge.category, name="category")
+                div.form-group
+                    lable Author
+                    input.form-control(type="text", value=challenge.author, name="author")
+                div.form-group
+                    label Description
+                    textarea.form-control(rows="6", name="description")= challenge.description
+                div.form-group
+                    label Flag
+                    input.form-control(type="text", value=challenge.flag, name="flag")
+                div.form-group
+                    if challenge.hidden == 1
+                        input(type="checkbox", class="form-check-input", name="hidden", checked)
+                    else 
+                        input(type="checkbox", class="form-check-input", name="hidden")
+                    label hidden
+                br
+                div.form-group
+                    label Files
+                    each file in challenge.files
+                        p= file   
+                            a(href="/secretjuju/challenge/"+challenge.no+"/deletefile/" + file) &nbsp;파일 삭제
+                
+                div.form-group
+                    label Upload file
+                    div#files
+                        input.form-control(type='file', name='file[]')
+                    br
+                    button#addfile.btn.btn-secondary(type="button") add file
+                
+                br
+                br
+                div.row
+                    .col-sm-1
+                        button.btn.btn-primary.mb-2 Modify
+                    .col-sm-1
+                        a.btn.btn-info.mb-2(href="/secretjuju/challenge/") List
+                    .col-sm-1
+                        a.btn.btn-danger.mb-2(href="/secretjuju/challenge/"+challenge.no+"/realrudaganya") Delete
+            br
+            br
+
+        script(type="text/javascript")
+            include admin_chall_create.js
+            
+        

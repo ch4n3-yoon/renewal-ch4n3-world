@@ -1,0 +1,49 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", rel="stylesheet")
+        script(src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+        
+    body
+        .container
+            h1 H3X0R CTF Managing Page
+            br
+            br
+
+            form(action="/secretjuju/createChallenge", method="post" enctype="multipart/form-data")
+                div.form-group
+                    label Title
+                    input.form-control(type="text", name="title")
+                div.form-group
+                    lable Category
+                    input.form-control(type="text", name="category")
+                div.form-group
+                    lable Author
+                    input.form-control(type="text", name="author")
+                div.form-group
+                    label Description
+                    textarea.form-control(rows="6", name="description")
+                div.form-group
+                    label Flag
+                    input.form-control(type="text", name="flag")
+                
+                .form-group
+                    input(type="checkbox", class="form-check-input", name="hidden")
+                    label &nbsp;hidden    
+                
+                div.form-group
+                    label File
+                    div#files
+                        input.form-control(type='file', name='file[]')
+                    br
+                    button#addfile.btn.btn-secondary(type="button") add file
+                br
+                button.btn.btn-primary.mb-2 Publish
+            br 
+            br
+        script(type="text/javascript")
+            include admin_chall_create.js

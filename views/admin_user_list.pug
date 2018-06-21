@@ -1,0 +1,47 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            include admin_sidebar.pug
+
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 H3X0R CTF User Modification
+                    P 유저에 걸려있는 하이퍼링크를 누르면 유저 관리 페이지로 넘어갑니다.
+                    table.table
+                        tr
+                            th #
+                            th nickname
+                            th point 
+                            th Last Solve Time
+
+                        - var rank = 1;
+                        each user in users
+                            tr
+                                td #{rank}
+                                td 
+                                    a(href="/secretjuju/user/" + user.no ) #{user.nickname}
+                                if user.point == null
+                                    td 0
+                                else 
+                                    td #{user.point}
+                                td #{user.lastsolvetime}
+                            - rank++;
+                    P Make sure to keep all page content within the 
+                        code #page-content-wrapper
+                        |.
+                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
+                              
+        script(type="text/javascript")
+            | $("#menu-toggle").click(function(e) {
+            |  e.preventDefault();
+            |  $("#wrapper").toggleClass("toggled");
+            | });

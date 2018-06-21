@@ -1,0 +1,73 @@
+doctype html
+html(lang="ko")
+    head
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link#bootstrap-css(href='//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css', rel='stylesheet')
+        script(src='//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js')
+        script(src='//code.jquery.com/jquery-1.11.1.min.js')
+    body
+        div.container
+            div#loginbox.mainbox.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2(style='margin-top:50px;')
+                .panel.panel-info
+                    .panel-heading
+                        .panel-title Login to H3X0R CTF
+                        div(style='float:right; font-size: 80%; position: relative; top:-10px')
+                            a(href='#') Forgot password?
+                    .panel-body(style='padding-top:30px')
+                        #login-alert.alert.alert-danger.col-sm-12(style='display:none')
+                        form#loginform.form-horizontal(action='/login', method='post')
+                            .input-group(style='margin-bottom: 25px')
+                                span.input-group-addon
+                                    i.glyphicon.glyphicon-user
+                                input#login-username.form-control(type='text', name='email', value='', placeholder='email')
+                            .input-group(style='margin-bottom: 25px')
+                                span.input-group-addon
+                                    i.glyphicon.glyphicon-lock
+                                input#login-password.form-control(type='password', name='pw', placeholder='password')
+                            
+                            .form-group(style='margin-top:10px')
+                                // Button
+                                .col-sm-12.controls
+                                    button#btn-login.btn.btn-success(type='submit') Login  
+
+                            .form-group
+                                .col-md-12.control
+                                    div(style='border-top: 1px solid#888; padding-top:15px; font-size:85%')
+                                        | Don't have an account! 
+                                        a(href='#', onclick="$('#loginbox').hide(); $('#signupbox').show()")
+                                            | Sign Up Here
+        #signupbox.mainbox.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2(style='display:none; margin-top:50px')
+            .panel.panel-info
+                .panel-heading
+                    .panel-title Register to H3X0R CTF
+                    div(style='float:right; font-size: 85%; position: relative; top:-10px')
+                        a#signinlink(href='#', onclick="$('#signupbox').hide(); $('#loginbox').show()") Sign In
+                .panel-body
+                    form#signupform.form-horizontal(role='form', action='/register', method='post')
+                        #signupalert.alert.alert-danger(style='display:none')
+                            p Error:
+                            span
+                        .form-group
+                            label.col-md-3.control-label(for='email') Email
+                            .col-md-9
+                                input.form-control(type='text', name='email', placeholder='Email Address')
+                        .form-group
+                            label.col-md-3.control-label(for='firstname') Nickname
+                            .col-md-9
+                                input.form-control(type='text', name='nickname', placeholder='First Name')
+                        .form-group
+                            label.col-md-3.control-label(for='password') Password
+                            .col-md-9
+                                input.form-control(type='password', name='pw', placeholder='Password')
+                        .form-group
+                            label.col-md-3.control-label(for='password') Password Again
+                            .col-md-9
+                                input.form-control(type='password', name='re_pw', placeholder='Password')
+                        .form-group
+                            // Button
+                            .col-md-offset-3.col-md-9
+                                button#btn-signup.btn.btn-info(type='submit')
+                                    i.icon-hand-right
+                                    |  &nbsp Sign Up
+                                span(style='margin-left:8px;')

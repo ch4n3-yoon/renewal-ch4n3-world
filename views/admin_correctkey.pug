@@ -1,0 +1,44 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            include admin_sidebar.pug
+
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 H3X0R CTF Correct Submissions
+                    P 맞은 플래그들을 모아두엇습니다. 
+                    table.table
+                        tr
+                            th ID
+                            th Team
+                            th Challenge 
+                            th Submission
+                            th Time
+
+                        each log in logs
+                            tr
+                                td #{log.no}
+                                td 
+                                    a(href='/user/' + log.email) #{log.nickname}
+                                td #{log.title}
+                                td #{log.enteredflag}
+                                td #{log.trytime}
+                    P Make sure to keep all page content within the 
+                        code #page-content-wrapper
+                        |.
+                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
+                              
+        script(type="text/javascript")
+            | $("#menu-toggle").click(function(e) {
+            |  e.preventDefault();
+            |  $("#wrapper").toggleClass("toggled");
+            | });

@@ -1,0 +1,74 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        meta(name="author", content="ch4n3")
+        title H3X0R CTF
+        link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://blackrockdigital.github.io/startbootstrap-small-business/css/small-business.css", rel="stylesheet")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/jquery/jquery.min.js")
+        script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    body
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+            .container
+                a.navbar-brand(href="/") H3X0R CTF
+                button.navbar-toggler(type="button",data-toggle="collapse",data-target="#navbarResponsive",aria-controls="navbarResponsive",aria-expanded="false",aria-label="Toggle navigation")
+                    span.navbar-toggler-icon
+                div#navbarResponsive.collapse.navbar-collapse
+                    ul.navbar-nav.ml-auto
+                        li.nav-item.active
+                            a.nav-link(href="/challenge") Home
+                                span.sr-only (current)
+                        li.nav-item
+                            a.nav-link(href="/rank") Rank
+                        each category in categorys
+                            li.nav-item
+                                a.nav-link(href="#" + category.toLowerCase()) #{category}
+        
+        div.container
+
+
+            each category in categorys
+                div#pwn.card.text-white.bg-secondary.my-4.text-center
+                    div(id=category)
+                        div.card-body
+                            p.text-white.m-0 
+                                h2 #{category}
+
+                div.row    
+                    each challenge in challenges
+                        if challenge.hidden == 0
+                            if challenge.category == category
+                                if challenge.isSolvedChall == 1
+                                    div.col-md-4.mb-4(style="color: #cccccc")
+                                        div.card.h-100
+                                            div.card-body
+                                                h2.card-title #{challenge.title}
+                                                p.card-text 
+                                                    | author : #{challenge.author}
+                                                    br
+                                                    | point : #{challenge.point}
+                                                    br
+                                                    | solvers : #{challenge.solvers}
+                                            div.card-footer
+                                                a.btn.btn-primary(href="/challenge/" + challenge.no) Go to solve
+                                else 
+                                    div.col-md-4.mb-4
+                                        div.card.h-100
+                                            div.card-body
+                                                h2.card-title #{challenge.title}
+                                                p.card-text 
+                                                    | author : #{challenge.author}
+                                                    br
+                                                    | point : #{challenge.point}
+                                                    br
+                                                    | solvers : #{challenge.solvers}
+                                            div.card-footer
+                                                a.btn.btn-primary(href="/challenge/" + challenge.no) Go to solve
+
+
+
+        footer.py-5.bg-dark
+            div.container
+                p.m-0.text-center.text-white Copyright &copy; H3X0R 2018
+                
