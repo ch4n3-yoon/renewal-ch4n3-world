@@ -413,27 +413,22 @@ route.get('/challenge', async (req, res) => {
 
 route.get('/challenge/:no', async (req, res) => {
 
-
-
-    // hidden 값이 적용되어 있는 경우 접근하지 못하도록 함.
-    var isHidden = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var query = "select hidden from challenges where no = ? ";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].hidden);
-            });
-        });
-    };
-
-
     var getChallenge = async (no) => {
         return new Promise(async (resolve, reject) => {
             var query = "select * from challenges where no = ?";
             var queryResult = await conn.query(query, [no], async (err, rows) => {
-                var challenge = rows[0];
-                challenge.files = await lib.getFiles(no);
 
-                resolve(challenge);
+                if (rows.length === 0) {
+                    resolve(0);
+                }
+
+                else {
+                    var challenge = rows[0];
+                    challenge.files = await lib.getFiles(no);
+
+                    resolve(challenge);
+                }
+
             });
         });
     };
@@ -446,11 +441,29 @@ route.get('/challenge/:no', async (req, res) => {
             return -1;
         }
 
-        if (await isHidden(no)) {
-            lib.alert(res, "sorry you cant access.");
+        var challenge = await getChallenge(no);
+
+        /*
+            해당 문제가 존재하지 않음. 경우는 크게 2가지임.
+            1. Attacker가 아직 만들어지지 않은 no 에 접속했을 경우
+            2. Attacker가 Invalid value를 전달했을 경우
+
+            (근데, 둘이 같은 얘기인 것 같은 이유는 무엇?)
+        */
+
+        if (!challenge) {
+            console.log(`[x] ${req.session.nickname} has accessed invalid path (/challenge/${no})`);
+            res.send("<script>alert('Invalid access is detected.'); history.back(); </script>");
+            return -1;
         }
 
-        var challenge = await getChallenge(no);
+        // 문제가 아직 숨김 상태일 때
+        if (challenge.hidden === 1) {
+            console.log(`[x] ${req.session.nickname} has accessed hidden challenge (/challenge/${no})`);
+            res.send("<script>alert('Invalid access is detected.'); history.back(); </script>");
+            return -1;
+        }
+
         res.render('./chall', challenge);
     }
 
