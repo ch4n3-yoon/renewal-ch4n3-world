@@ -43,7 +43,7 @@ module.exports = {
 
     alert: (res, msg) => {
         return Promise(async (resolve, reject) => {
-            var message = `<script>alert('${msg}')</script>`;
+            var message = `<script>alert('${msg}'); history.back(); </script>`;
             res.send(message);
             res.end();
         });
