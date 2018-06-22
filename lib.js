@@ -10,24 +10,34 @@ module.exports = {
         if (err) {
             res.status(500).json({ "status_code": 500, "status_message": "internal server error" });
         }
-    }, 
+    },
     replaceAll: function(str, searchStr, replaceStr) {
         return str.split(searchStr).join(replaceStr);
     },
 
-    getFiles: function(no) {
-        var files;
-        new Promise(function(resolve, reject) {
-            fs.readdir('uploads/' + no, function(err, items) {
-                // console.log(items);
-                console.log("[*] readdir ./uploads/" + no);
-                files = items;
+    getFiles: (no) => {
+        return new Promise(async (resolve, reject) => {
+
+            if (no === NaN) {
+                resolve(-1);
+                return;
+            }
+
+            var files;
+            var path = 'uploads/' + no;
+
+            await fs.stat(path, (err, stats) => {
+                // No such file or directory
+                if (err && err.errno === 34) {
+                    resolve(-1);
+                    return;
+                }
             });
-        }).then(function() {
-            console.log(files);
+
+            fs.readdir(path, async (err, files) => {
+                resolve(files);
+            });
         });
-        
-        return files;
     },
-    
+
 };
