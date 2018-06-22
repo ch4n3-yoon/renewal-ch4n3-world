@@ -6,6 +6,7 @@ module.exports = {
     sha512: function(str) {
         return crypto.createHash('sha512').update(str).digest('hex');
     },
+
     error: function(err) {
         if (err) {
             res.status(500).json({ "status_code": 500, "status_message": "internal server error" });
@@ -39,5 +40,13 @@ module.exports = {
             });
         });
     },
+
+    alert: (res, msg) => {
+        return Promise(async (resolve, reject) => {
+            var message = `<script>alert('${msg}')</script>`;
+            res.send(message);
+            res.end();
+        });
+    }
 
 };
