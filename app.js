@@ -44,13 +44,17 @@ app.use('/', route);
 //////////////////////////////////////////////
 
 /* Useful Functions */
-var isLogin = (email) => {
+var isLogin = (res, email) => {
     if (!email) {
-        res.send("<script>alert('Login is required.'); location.href = '/login'; </script>");
-        res.end();
+        res.send(`<script>
+                    alert('Sorry, this page needs your login.');
+                    location.href = '/login';
+                </script>`);
+        return 0;
     }
-};
 
+    return 1;
+};
 
 
 route.get('/', function(req, res) {
@@ -86,7 +90,6 @@ route.post('/login', function(req, res) {
     var pw = req.body.pw;
 
 
-    ipLog(req.ip, email);
 
     // 혹시라도 email값이나 pw 값을 보내지 않았을 경우 다음 분기문을 실행함.
     if (!email && !pw) {
@@ -325,8 +328,6 @@ route.get('/challenge', async (req, res) => {
         console.log("email : " + email + " | ip : " + req.ip);
     }
 
-    ipLog(req.ip, email);
-
     var no = req.session.no;
 
     var challenges = [];
@@ -412,18 +413,6 @@ route.get('/challenge', async (req, res) => {
 
 route.get('/challenge/:no', async (req, res) => {
 
-    console.log(req.session);
-
-    // 로그인을 하지 않았을 경우
-    // challenge listing 에 접근하지 못하도록 함
-
-    if (!req.session.email) {
-        res.send("<script>alert('Login plz'); location.href='/login'  </script>");
-        res.end();
-        return;
-    }
-
-    ipLog(req.ip, req.session.email);
 
 
     // hidden 값이 적용되어 있는 경우 접근하지 못하도록 함.
@@ -437,58 +426,36 @@ route.get('/challenge/:no', async (req, res) => {
     };
 
 
-    if (await isHidden(req.params.no) === 1) {
-        res.send("<script>alert('You cant access to this challenge..'); history.back();</script>");
-        res.end();
+    var getChallenge = async (no) => {
+        return new Promise(async (resolve, reject) => {
+            var query = "select * from challenges where no = ?";
+            var queryResult = await conn.query(query, [no], async (err, rows) => {
+                var challenge = rows[0];
+                challenge.files = await lib.getFiles(no);
+
+                resolve(challenge);
+            });
+        });
+    };
+
+    var main = async () => {
+        var no = Number(req.params.no);
+        var email = req.session.email;
+
+        if (!isLogin(res, email)) {
+            return -1;
+        }
+
+        if (await isHidden(no)) {
+            lib.alert(res, "sorry you cant access.");
+        }
+
+        var challenge = await getChallenge(no);
+        res.render('./chall', challenge);
     }
 
-    // DB에서 빼온 값을 저장하기 위한 변수 선언
-    var title, no, description;
-    var files = [];
+    main();
 
-    no = Number(req.params.no);
-    console.log("[*] User access to " + no);
-    console.log(lib.getFiles(no));
-
-    new Promise(function(resolve, reject) {
-        fs.readdir('uploads/' + no, function(err, items) {
-            // console.log(items);
-            console.log("[*] readdir ./uploads/" + no);
-            files = items;
-        });
-    });
-
-    new Promise(function(resolve, reject) {
-        var query = "SELECT * FROM `challenges` WHERE `no`=?";
-        result = conn.query(query, [no], function(err, rows) {
-            if (err)
-                reject(err);
-            // console.log(rows[0]);
-
-            /*
-                선언한 변수에 DB에서 나온 값들을 저장함
-            */
-
-            var challenge = {
-                'no': rows[0].no,
-                'title': rows[0].title,
-                'point': rows[0].point,
-                'category': rows[0].category,
-                'description': rows[0].description,
-                'author': rows[0].author,
-                'solvers': rows[0].solvers,
-                'flag': rows[0].flag
-            };
-
-            challenge.files = files;
-
-            // console.log(challenge);
-            resolve(challenge);
-        });
-    }).then(function(challenge) {
-        // console.log(challenge);
-        res.render('chall', challenge);
-    });
 });
 
 
