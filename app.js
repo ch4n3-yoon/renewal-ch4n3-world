@@ -77,7 +77,6 @@ route.get('/about', function(req, res) {
 });
 
 route.get('/login', function(req, res) {
-    console.log(req.session);
     res.render("login.pug");
 });
 
@@ -93,7 +92,7 @@ route.post('/login', function(req, res) {
 
     // 혹시라도 email값이나 pw 값을 보내지 않았을 경우 다음 분기문을 실행함.
     if (!email && !pw) {
-        res.write("<script>alert('No value sended.'); history.back();</script>");
+        res.send("<script>alert('No value sended.'); history.back();</script>");
         // res.end();
     }
 
@@ -128,9 +127,7 @@ route.post('/login', function(req, res) {
             sess.registertime = row.registertime;
             sess.admin = row.admin;
 
-            console.log(sess);
             sess.save();
-
             res.send("<script>alert('login success'); location.href='/'; </script>");
         }
     });
@@ -140,12 +137,8 @@ route.post('/login', function(req, res) {
 
 
 
-
-
 route.get('/logout', function(req, res) {
-    req.session.destroy(function(err){
-        // cannot access session here
-    });
+    req.session.destroy();
     res.writeHead(302, { 'Content-Type': 'text/html',
                             'Location': '/' });
     res.end();
@@ -1770,7 +1763,7 @@ route.get('/admin', function(req, res) {
 });
 
 // Run the CTF server
-var server = app.listen(serverConfig.port, function() {
+var server = app.listen(serverConfig.port, () => {
     console.log("[*] H3X0R CTF Server Start at port " + serverConfig.port);
 });
 
