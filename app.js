@@ -940,6 +940,8 @@ route.get('/secretjuju/challenge/:no', function(req, res) {
     });
 });
 
+
+
 // 파일업로드 기능 추가
 // 2018.05.21 정상 작동 확인
 route.post('/secretjuju/challenge/:no', async (req, res) => {
@@ -1706,12 +1708,50 @@ route.get('/secretjuju/user/:no/delete', async (req, res) => {
         return new Promise(async (resolve, reject) => {
 
             var query = "delete from users where no = ?";
-            var queryResult = conn.query(query, [no]);
+            var queryResult = await conn.query(query, [no]);
 
         });
     };
 
+    var no2email = async (no) => {
+        return new Promise(async (resolve, reject) => {
+            var query = "select email from users where no = ?";
+            var queryResult = await conn.query(query, [no], (err, rows) => {
+                // 해당 사용자가 존재하지 않는 경우
+                if (rows.length === 0) {
+                    resolve(0);
+                }
+
+                else {
+                    resolve(rows[0].email);
+                }
+            });
+        });
+    }
+
+    var getSolvedChallenge = async (no) => {
+        return new Promise(async (resolve, reject) => {
+            var email = no2email(no);
+            var query = "select * from solvers where email = ?";
+            var queryResult = await conn.query(query, [email], (err, rows) => {
+                resolve
+            });
+        });
+    }
+
+    var increaseSolvedChallengePoint = async (no) => {
+        return new Promise(async (resolve, reject) => {
+            var solvedChallenges = getSolvedChallenge(no);
+            for (var i = 0; i < solvedChallenges.length; i++) {
+                var solvedno = solvedChallenges[i].solvedno;
+                var query = "update challenges set point = point + 10 where no = ?";
+                var queryResult = await conn.query(query, [solvedno]);
+            }
+        });
+    };
+
     var main = async () => {
+        increaseSolvedChallengePoint(no);
         deleteUserByNo(no);
         res.send("<script>alert('Successfully deleted.'); location.href = '/secretjuju/user'; </script>");
         res.end();
