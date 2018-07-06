@@ -74,9 +74,9 @@ module.exports = {
     },
 
     // 로그인에 사용되는 함수
-    login: async (email, password, fn) => {
+    login: (email, password, fn) => {
         var query = "select * from users where email = ? and password = ? ";
-        var sqlResult = await conn.query(query, [email, password], (err, rows) => {
+        var sqlResult = conn.query(query, [email, password], (err, rows) => {
             if (rows.length === 0)
                 fn(0);
             else
