@@ -20,45 +20,41 @@ router.get('/login', function(req, res) {
 
 router.post('/login', function(req, res) {
 
-    var email = req.body.email;
-    var pw = req.body.pw;
+    var sess = req.session;
 
-    /* 사용자가 email과 혹은 pw를 보내지 않은 경우 */
-    if (!email || !pw) {
+    var email = req.body.email;
+    var password = req.body.pw;
+
+    /* 사용자가 email 혹은 pw를 보내지 않은 경우 */
+    if (!email || !password) {
         res.send("<script>alert('No value sended.'); history.back();</script>");
         res.end();
     }
 
-    pw = lib.sha512(pw);
+    password = lib.sha512(password);
 
-    // Promise 를 사용하여, Login 쿼리를 날림
-    new Promise(function(resolve, reject) {
-        var query = "SELECT * FROM `users` WHERE email = ? AND password = ?";
-        conn.query(query, [email, pw], function(err, rows){
-            if (err)
-                throw err;
+    lib.login(email, password, (result) => {
+        if (result) {
+            sess.no = result.no;
+            sess.email = result.email;
+            sess.nickname = result.nickname;
+            sess.registertime = result.registertime;
+            sess.admin = result.admin;
 
-            resolve(rows[0]);
-        });
-    }).then(function(row) {
-        // console.log(row);
+            sess.save();
 
-        // rows 가 정의되지 않았을 때
-        if (typeof row === "undefined") {
-            res.send("<script>alert('Login failed. check your email or password. '); history.back(); </script>");
-            // console.error(new Error('Whoops, rows is undefined at login script'));
-            res.end();
+            res.send(`<script>
+                        alert('Successfully logged in');
+                        location.href = '/';
+                    </script>`);
         }
 
         else {
-            req.session.no = row.no;
-            req.session.email = row.email;
-            req.session.nickname = row.nickname;
-            req.session.registertime = row.registertime;
-            req.session.admin = row.admin;
-
-            req.session.save();
-            res.send("<script>alert('login success'); location.href='/'; </script>");
+            var data = `<script>
+                            alert('Login failed. Please check your email or password again');
+                            history.back();
+                        </script>`;
+            res.send(data);
         }
     });
 
