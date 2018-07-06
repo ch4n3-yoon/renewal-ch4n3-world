@@ -2,5 +2,5 @@
 .vscode
 node_modules
 uploads
-./config/dbSetting.js
+config/dbSetting.js
 .gitignore
