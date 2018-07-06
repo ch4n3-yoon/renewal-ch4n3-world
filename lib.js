@@ -1,5 +1,5 @@
 var crypto = require("crypto");
-var conn = require("./dbconnect").conn;
+var conn = require("./dbconnect.js").conn;
 var fs = require("fs");
 
 module.exports = {
@@ -46,6 +46,30 @@ module.exports = {
             var message = `<script>alert('${msg}'); history.back(); </script>`;
             res.send(message);
             res.end();
+        });
+    },
+
+    // email과 nickname이 이미 존재하는지 확인하는 코드
+    isUserInfoExist: async (email, nickname, fn) => {
+
+        var query = "select * from users where email = ? or nickname = ?";
+        var sqlResult = await conn.query(query, [email, nickname], (err, rows) => {
+
+            // 중복된 계정 존재
+            if (rows.length != 0) {
+                fn(1);
+            }
+
+            fn(0);
+        });
+
+    },
+
+    insertUser: (email, nickname, password) => {
+        var query = "insert into users (email, nickname, password, registertime) "
+        query += "values (?, ?, ?, now())";
+        conn.query(query, [email, nickname, password], (err, rows) => {
+            console.log("[+] " + nickname + " has inserted.");
         });
     }
 
