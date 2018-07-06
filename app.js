@@ -38,7 +38,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(fileUpload());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-app.use('/', route);
+
+const root = require('./router/root.js');
+// app.use('/', route);
+app.use('/', root);
+
 
 
 //////////////////////////////////////////////
@@ -56,140 +60,133 @@ var isLogin = (res, email) => {
     return 1;
 };
 
+//
+// route.get('/', function(req, res) {
+//
+//     var isLogin = 0;
+//
+//     // 로그인한 상태인지 확인
+//     if (req.session.email)
+//         isLogin = 1;
+//
+//     res.render('index', {isLogin: isLogin});
+// });
+//
+//
+//
+//
+//
+// route.get('/about', function(req, res) {
+//     res.render('about');
+// });
+//
+// route.get('/login', function(req, res) {
+//     res.render("login.pug");
+// });
+//
+// route.post('/login', function(req, res) {
+//
+//     // set session variable
+//     const sess = req.session;
+//
+//     var email = req.body.email;
+//     var pw = req.body.pw;
+//
+//
+//
+//     // 혹시라도 email값이나 pw 값을 보내지 않았을 경우 다음 분기문을 실행함.
+//     if (!email && !pw) {
+//         res.send("<script>alert('No value sended.'); history.back();</script>");
+//         // res.end();
+//     }
+//
+//     // 패스워드를 입력했다면 sha512로 Hashing 함
+//     if (pw)
+//         pw = lib.sha512(pw);
+//
+//     // Promise 를 사용하여, Login 쿼리를 날림
+//     new Promise(function(resolve, reject) {
+//         var query = "SELECT * FROM `users` WHERE email = ? AND password = ?";
+//         conn.query(query, [email, pw], function(err, rows){
+//             if (err)
+//                 throw err;
+//
+//             resolve(rows[0]);
+//         });
+//     }).then(function(row) {
+//         // console.log(row);
+//
+//         // rows 가 정의되지 않았을 때
+//         if (typeof row === "undefined") {
+//             res.send("<script>alert('Login failed. check your email or password. '); history.back(); </script>");
+//             // console.error(new Error('Whoops, rows is undefined at login script'));
+//             res.end();
+//         }
+//
+//         else {
+//
+//             sess.no = row.no;
+//             sess.email = row.email;
+//             sess.nickname = row.nickname;
+//             sess.registertime = row.registertime;
+//             sess.admin = row.admin;
+//
+//             sess.save();
+//             res.send("<script>alert('login success'); location.href='/'; </script>");
+//         }
+//     });
+//
+// });
+//
+//
+//
+//
+// route.get('/logout', function(req, res) {
+//     req.session.destroy();
+//     res.writeHead(302, { 'Content-Type': 'text/html',
+//                             'Location': '/' });
+//     res.end();
+// })
+//
+//
+// route.get('/register', function(req, res) {
+//     res.render('login.pug');
+// });
+//
+// route.post('/register', function(req, res){
+//     var email, nickname, pw;
+//     var ok = 1;
+//     if (req.body.pw != req.body.re_pw) {
+//         res.send("<script>alert('Your two passwords are different.');history.back();</script>");
+//     }
+//
+//     email = req.body.email;
+//     nickname = req.body.nickname;
+//     pw = lib.sha512(req.body.pw);
+//
+//     // 중복된 계정이 있는지 확인
+//     var query = "SELECT * FROM `users` WHERE email = ? or nickname = ?";
+//     conn.query(query, [email, nickname], function(err, rows){
+//         /*
+//             rows.length 가 0이 아니라면 중복된 계정이 있다는 뜻.
+//             rows.length 가 0이라면 중복된 계정이 없음.
+//         */
+//         if (rows.length != 0) {
+//             res.send("<script>alert('Duplicated email or nickname');history.back();</script>");
+//         } else {
+//             console.log(query);
+//             var query = "INSERT INTO `users` (`email`, `nickname`, `password`, `registertime`) VALUES (?, ?, ?, NOW())";
+//             conn.query(query, [email, nickname, pw], function(err, rows){
+//                 lib.error(err);
+//
+//                 console.log("[+] " + nickname + " has inserted.");
+//
+//                 res.send("<script>alert('register ok.'); location.href='/';</script>");
+//             });
+//         }
+//     });
+// });
 
-route.get('/', function(req, res) {
-
-    var isLogin = 0;
-
-    // 로그인한 상태인지 확인
-    if (req.session.email)
-        isLogin = 1;
-
-    res.render('index', {isLogin: isLogin});
-});
-
-
-
-
-
-route.get('/about', function(req, res) {
-    res.render('about');
-});
-
-route.get('/login', function(req, res) {
-    res.render("login.pug");
-});
-
-route.post('/login', function(req, res) {
-
-    // set session variable
-    const sess = req.session;
-
-    var email = req.body.email;
-    var pw = req.body.pw;
-
-
-
-    // 혹시라도 email값이나 pw 값을 보내지 않았을 경우 다음 분기문을 실행함.
-    if (!email && !pw) {
-        res.send("<script>alert('No value sended.'); history.back();</script>");
-        // res.end();
-    }
-
-    // 패스워드를 입력했다면 sha512로 Hashing 함
-    if (pw)
-        pw = lib.sha512(pw);
-
-    // Promise 를 사용하여, Login 쿼리를 날림
-    new Promise(function(resolve, reject) {
-        var query = "SELECT * FROM `users` WHERE email = ? AND password = ?";
-        conn.query(query, [email, pw], function(err, rows){
-            if (err)
-                throw err;
-
-            resolve(rows[0]);
-        });
-    }).then(function(row) {
-        // console.log(row);
-
-        // rows 가 정의되지 않았을 때
-        if (typeof row === "undefined") {
-            res.send("<script>alert('Login failed. check your email or password. '); history.back(); </script>");
-            // console.error(new Error('Whoops, rows is undefined at login script'));
-            res.end();
-        }
-
-        else {
-
-            sess.no = row.no;
-            sess.email = row.email;
-            sess.nickname = row.nickname;
-            sess.registertime = row.registertime;
-            sess.admin = row.admin;
-
-            sess.save();
-            res.send("<script>alert('login success'); location.href='/'; </script>");
-        }
-    });
-
-});
-
-
-
-
-route.get('/logout', function(req, res) {
-    req.session.destroy();
-    res.writeHead(302, { 'Content-Type': 'text/html',
-                            'Location': '/' });
-    res.end();
-})
-
-
-route.get('/register', function(req, res) {
-    res.render('login.pug');
-});
-
-route.post('/register', function(req, res){
-    var email, nickname, pw;
-    var ok = 1;
-    if (req.body.pw != req.body.re_pw) {
-        res.send("<script>alert('Your two passwords are different.');history.back();</script>");
-    }
-
-    email = req.body.email;
-    nickname = req.body.nickname;
-    pw = lib.sha512(req.body.pw);
-
-    // 중복된 계정이 있는지 확인
-    var query = "SELECT * FROM `users` WHERE email = ? or nickname = ?";
-    conn.query(query, [email, nickname], function(err, rows){
-        /*
-            rows.length 가 0이 아니라면 중복된 계정이 있다는 뜻.
-            rows.length 가 0이라면 중복된 계정이 없음.
-        */
-        if (rows.length != 0) {
-            res.send("<script>alert('Duplicated email or nickname');history.back();</script>");
-        } else {
-            console.log(query);
-            var query = "INSERT INTO `users` (`email`, `nickname`, `password`, `registertime`) VALUES (?, ?, ?, NOW())";
-            conn.query(query, [email, nickname, pw], function(err, rows){
-                lib.error(err);
-
-                console.log("[+] " + nickname + " has inserted.");
-
-                res.send("<script>alert('register ok.'); location.href='/';</script>");
-            });
-        }
-    });
-});
-
-
-
-
-
-route.get('/team', function(req, res) {
-    res.send('just team view');
-});
 
 app.get('/user/:no', async (req, res) => {
 
