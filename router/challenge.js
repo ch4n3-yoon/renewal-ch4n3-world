@@ -17,7 +17,6 @@ router.get('/', async (req, res) => {
     }
 
     var email = req.session.email;
-
     var no = req.session.no;
 
     var challenges = [];
@@ -134,23 +133,12 @@ router.get('/:no', async (req, res) => {
         var challenge = await getChallenge(no);
 
         /*
-            해당 문제가 존재하지 않음. 경우는 크게 2가지임.
-            1. Attacker가 아직 만들어지지 않은 no 에 접속했을 경우
-            2. Attacker가 Invalid value를 전달했을 경우
-
-            (근데, 둘이 같은 얘기인 것 같은 이유는 무엇?)
+            1. 문제가 존재하지 않을 경우
+            2. 문제에 hidden이 적용되어 있는 경우
         */
-
-        if (!challenge) {
+        if (!challenge || challenge.hidden === 1) {
             console.log(`[x] ${req.session.nickname} has accessed invalid path (/challenge/${no})`);
-            res.send("<script>alert('Invalid access is detected.'); history.back(); </script>");
-            return -1;
-        }
-
-        // 문제가 아직 숨김 상태일 때
-        if (challenge.hidden === 1) {
-            console.log(`[x] ${req.session.nickname} has accessed hidden challenge (/challenge/${no})`);
-            res.send("<script>alert('Invalid access is detected.'); history.back(); </script>");
+            res.send("<script>alert('Invalid access detected'); history.back(); </script>");
             return -1;
         }
 
@@ -196,7 +184,7 @@ router.post('/:no/auth', async function(req, res) {
         return new Promise(async (resolve, reject) => {
 
             var query = "select title from challenges where no = ?";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
+            var queryResult = conn.query(query, [no], async (err, rows) => {
                 resolve(rows[0].title);
             });
 
@@ -207,21 +195,21 @@ router.post('/:no/auth', async function(req, res) {
         return new Promise(async (resolve, reject) => {
 
             var query = "select point from challenges where no = ?";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
+            var queryResult = conn.query(query, [no], async (err, rows) => {
                 resolve(rows[0].point);
             });
 
         });
     };
 
-    var decreasePoint = async (no) => {
+    var decreasePoint = (no) => {
         return new Promise(async (resolve, reject) => {
 
             var point = await getChallPoint(no);
 
             if (point > 10) {
                 var query = "update challenges set point = point - 10 where no = ?";
-                var queryResult = await conn.query(query, [no]);
+                var queryResult = conn.query(query, [no]);
                 resolve(point - 10);
             }
 
@@ -290,26 +278,27 @@ router.post('/:no/auth', async function(req, res) {
                 var flag = await getFlag(no);
                 if (flag === userFlag) {
 
-                    await insertIntoSolvers(no, email);     // solvers 테이블에 insert
-                    await decreasePoint(no);                // challenges 에 있는 해당 문제에 -10 점을 함
-                    await insertIntoAuthlog(no, email, userFlag, 1);
-                                                            // authlog 테이블에 insert
+                    insertIntoSolvers(no, email);       // solvers 테이블에 insert
+                    decreasePoint(no);                  // challenges 에 있는 해당 문제에 -10 점을 함
+                    insertIntoAuthlog(no, email, userFlag, 1);
+                                                        // authlog 테이블에 insert
 
-                    res.send("<script>alert('Correct flag!'); location.href = '/challenge'; </script>");
+                    res.send(`<script>
+                                alert('Correct flag!');
+                                location.href = '/challenge';
+                            </script>`);
                     res.end();
                 }
 
                 else {
 
-                    await insertIntoAuthlog(no, email, userFlag, 0);
-
-                    res.send("<script>alert('flag is not correct'); history.back(); </script>");
+                    insertIntoAuthlog(no, email, userFlag, 0);
+                    res.send("<script>alert('wrong flag'); history.back(); </script>");
                     res.end();
                 }
             }
 
             else {
-                // console.info("[*] " + req.session.nickname + "가 '" + title + "' 문제를 다시 " );
                 res.send("<script>alert('you\\\'ve already solved it'); history.back(); </script>");
             }
 
