@@ -1,0 +1,16 @@
+#sidebar-wrapper 
+    ul.sidebar-nav
+        li.sidebar-brand
+            a(href="/") H3X0R CTF
+        li
+            a(href="/rank") Rank
+        li
+            a(href="/challenge") Challenges
+        
+        //- 로그인하지 않았을 때
+        if isLogin == 0
+            li
+                a(href="/login") Login & Register
+        else 
+            li 
+                a(href="/logout") Logout
