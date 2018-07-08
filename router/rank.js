@@ -9,7 +9,6 @@ var conn = require("../dbconnect.js").conn;
 router.get('/', async (req, res) => {
 
     var getUsers = async () => {
-
         return new Promise(async (resolve, reject) => {
 
             var query = "select *, ";
@@ -17,12 +16,11 @@ router.get('/', async (req, res) => {
             query += "(select solvetime from solvers where email = users.email order by solvetime desc limit 1) as lastsolvetime ";
             query += "from users where admin = 0 order by point desc, lastsolvetime asc ";
 
-            var queryResult = await conn.query(query, (err, rows) => {
+            var queryResult = conn.query(query, (err, rows) => {
                 resolve(rows);
             });
 
         });
-
     };
 
 
@@ -33,9 +31,8 @@ router.get('/', async (req, res) => {
             return 0;
     }
 
-    var setUsers = async (rows) => {
-
-        return new Promise(async (resolve, reject) => {
+    var setUsers = (rows) => {
+        return new Promise( (resolve, reject) => {
 
             // point 가 null 값을 갖고 있다면 0으로 바꾼다.
             // lastsolvetime 이 null 이라면 'not yet'으로 바꾼다.
@@ -51,11 +48,9 @@ router.get('/', async (req, res) => {
             resolve(rows);
 
         });
-
     };
 
-    var main = async () => {
-
+    var main = () => {
         return new Promise(async (resolve, reject) => {
 
             var users = await getUsers();
@@ -63,13 +58,10 @@ router.get('/', async (req, res) => {
 
             res.render('./rank', {users: users, isLogin: isLogin()});
 
-
             resolve();
 
         });
-
     };
-
 
     main();
 
