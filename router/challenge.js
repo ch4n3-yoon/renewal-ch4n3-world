@@ -126,8 +126,12 @@ router.get('/:no', async (req, res) => {
         var no = Number(req.params.no);
         var email = req.session.email;
 
-        if (!isLogin(res, email)) {
-            return -1;
+        if (!email) {
+            res.send(`<script>
+                        alert('This page needs your login ㅠㅠ');
+                        location.href = '/login';
+                    </script>`);
+            return;
         }
 
         var challenge = await getChallenge(no);
