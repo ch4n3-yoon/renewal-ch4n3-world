@@ -876,19 +876,10 @@ router.get('/user', async (req, res) => {
     };
 
     var main = async () => {
+        var users = await getUsers();
+        var users = await setUsers(users);
 
-        return new Promise(async (resolve, reject) => {
-
-            var users = await getUsers();
-            var users = await setUsers(users);
-
-            res.render('./admin_user_list', {users: users});
-
-
-            resolve();
-
-        });
-
+        res.render('./admin_user_list', {users: users});
     };
 
     var email = req.session.email;
