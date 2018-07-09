@@ -51,10 +51,8 @@ app.use('/rank', rank);
 app.use('/secretjuju', secretjuju);
 
 
-
-// 페이크용 관리자 페이지
-route.get('/admin', function(req, res) {
-    res.send("admin page? just guessing plz lol (grin)");
+app.use( (req, res, next) => {
+    res.render("404.pug", {url: req.url});
 });
 
 
@@ -63,7 +61,7 @@ var server = app.listen(serverConfig.port, () => {
     console.log("[*] H3X0R CTF Server Start at port " + serverConfig.port);
 });
 
-// 서버 SSL 적용해서 시작하는 부분
+// Do you want to use https?
 // var server = require('greenlock-express').create({
 //     version: 'v02',
 //     configDir: '/etc/letsencrypt',
