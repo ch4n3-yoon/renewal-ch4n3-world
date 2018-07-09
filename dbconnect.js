@@ -11,8 +11,25 @@ var conn = mysql.createConnection({
 
 conn.connect();
 
-module.exports = {conn: conn};
+console.log("[*] making users table");
+var query = "CREATE TABLE `users` IF NOT EXISTS ( `no` INT NOT NULL AUTO_INCREMENT , `email` VARCHAR(256) NOT NULL , `password` VARCHAR(256) NOT NULL , `nickname` VARCHAR(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL , `registertime` DATETIME NOT NULL , `admin` INT NOT NULL DEFAULT 0 , PRIMARY KEY (`no`)) ENGINE = MyISAM CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT = 'H3X0R CTF';";
+conn.query(query);
 
+console.log("[*] making challenges table");
+var query = "CREATE TABLE `challenges` IF NOT EXISTS ( `no` INT NOT NULL AUTO_INCREMENT , `title` VARCHAR(256) NOT NULL , `author` VARCHAR(256) NOT NULL , `category` VARCHAR(256) NOT NULL , `description` TEXT NOT NULL , `solvers` INT NOT NULL , `flag` VARCHAR(256) NOT NULL , `files` VARCHAR(256) NULL , `hidden` INT NOT NULL , `point` INT NOT NULL , PRIMARY KEY (`no`)) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_unicode_ci;";
+conn.query(query);
+
+console.log("[*] making solvers query");
+var query = "CREATE TABLE `solvers` IF NOT EXISTS ( `no` INT NOT NULL AUTO_INCREMENT , `solvedno` INT NOT NULL, `email` VARCHAR(256) NOT NULL , `solvetime` DATETIME NOT NULL , PRIMARY KEY (`no`)) ENGINE = MyISAM;";
+conn.query(query);
+
+console.log("[*] making authlog table");
+var query = "CREATE TABLE `authlog` IF NOT EXISTS ( `no` INT NOT NULL AUTO_INCREMENT , `solvingno` INT NOT NULL , `email` VARCHAR(256) NOT NULL , `enteredflag` VARCHAR(256) NOT NULL , `state` INT NOT NULL , `trytime` DATETIME NOT NULL , PRIMARY KEY (`no`)) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_unicode_ci;";
+conn.query(query);
+
+console.log("[*] DB setting is done. ");
+
+module.exports = {conn: conn};
 
 /*
 CREATE TABLE `users` ( `no` INT NOT NULL AUTO_INCREMENT , `email` VARCHAR(256) NOT NULL , `password` VARCHAR(256) NOT NULL , `nickname` VARCHAR(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL , `registertime` DATETIME NOT NULL , PRIMARY KEY (`no`)) ENGINE = MyISAM CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT = 'H3X0R CTF';
