@@ -37,6 +37,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(fileUpload());
 app.use('/uploads', express.static(__dirname + '/uploads'));
+app.use(express.static('public'));
 
 
 const root = require('./router/root.js');

@@ -4,3 +4,4 @@ node_modules
 uploads
 config/dbSetting.js
 .gitignore
+.idea
