@@ -58,7 +58,7 @@ app.use( (req, res, next) => {
 
 // Run the CTF server
 var server = app.listen(serverConfig.port, () => {
-    console.log("[*] H3X0R CTF Server Start at port " + serverConfig.port);
+    console.log("[*] nCTF Server started at port " + serverConfig.port);
 });
 
 // Do you want to use https?
