@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const CONF = require('../config/dbSetting');
+const FUNC = require('./function');
 
 const API = new Sequelize(CONF.database, CONF.user, CONF.password, {
     host: CONF.host,

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const API = require('../config.js');
+const API = require('./config.js');
 
 class UserAPI {
     constructor() { this.API = API }
