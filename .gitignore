@@ -2,7 +2,7 @@
 .vscode
 node_modules
 uploads
-config/dbSetting.js
+config/*
 .gitignore
 .idea
 tmp

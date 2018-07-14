@@ -1,6 +1,6 @@
 doctype html
 html(lang="ko")
-    head 
+    head
         meta(charset="utf-8")
         title H3X0R CTF
         link(href="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/css/bootstrap.min.css", rel="stylesheet")
@@ -9,37 +9,37 @@ html(lang="ko")
         script(src="https://blackrockdigital.github.io/startbootstrap-simple-sidebar/vendor/bootstrap/js/bootstrap.bundle.min.js")
     body
         #wrapper
-            include admin_sidebar.pug
+            include sidebar.pug
 
 
             #page-content-wrapper
                 .container-fluid
                     h1 H3X0R CTF Rank
-                    P 순위는 잘생긴 순이 아니라 포인트 순입니다. 
+                    P 순위는 잘생긴 순이 아니라 포인트 순입니다.
                     table.table
                         tr
                             th #
                             th nickname
-                            th point 
+                            th point
                             th Last Solve Time
 
                         - var rank = 1;
                         each user in users
                             tr
                                 td #{rank}
-                                td 
+                                td
                                     a(href="/user/" + user.no) #{user.nickname}
                                 if user.point == null
                                     td 0
-                                else 
+                                else
                                     td #{user.point}
                                 td #{user.lastsolvetime}
                             - rank++;
-                    P Make sure to keep all page content within the 
+                    P Make sure to keep all page content within the
                         code #page-content-wrapper
                         |.
                     a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
-                              
+
         script(type="text/javascript")
             | $("#menu-toggle").click(function(e) {
             |  e.preventDefault();
