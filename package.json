@@ -19,8 +19,12 @@
     "jshint": "^2.9.5",
     "multer": "^1.3.0",
     "mysql": "^2.15.0",
+    "mysql2": "^1.5.3",
     "node-schedule": "^1.3.0",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
     "pug": "^2.0.3",
+    "sequelize": "^4.38.0",
     "supervisor": "^0.12.0"
   }
 }
