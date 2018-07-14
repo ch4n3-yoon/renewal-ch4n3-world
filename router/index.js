@@ -36,30 +36,28 @@ router.post('/login', function(req, res) {
 
     password = lib.sha512(password);
 
-    lib.login(email, password, (result) => {
-        if (result) {
-            sess.no = result.no;
-            sess.email = result.email;
-            sess.nickname = result.nickname;
-            sess.registertime = result.registertime;
-            sess.admin = result.admin;
+    let result = await API.login(email, password);
+    if (result.length) {
+        sess.no = result.no;
+        sess.email = result.email;
+        sess.nickname = result.nickname;
+        sess.registertime = result.registertime;
+        sess.admin = result.admin;
 
-            sess.save();
+        sess.save();
 
-            res.send(`<script>
+        res.send(`<script>
                         alert('Successfully logged in');
                         location.href = '/';
                     </script>`);
-        }
+    }
 
-        else {
-            var data = `<script>
-                            alert('Login failed. Please check your email or password again');
-                            history.back();
-                        </script>`;
-            res.send(data);
-        }
-    });
+    else {
+        res.send(`<script>
+                      alert('Login failed. Please check your email or password again');
+                      history.back();
+                  </script>`);
+    }
 
 });
 
@@ -71,7 +69,7 @@ router.get('/logout', function(req, res) {
     res.writeHead(302, { 'Content-Type': 'text/html',
                             'Location': '/' });
     res.end();
-})
+});
 
 
 router.get('/register', function(req, res) {
@@ -91,17 +89,17 @@ router.post('/register', async (req, res) => {
     var nickname = req.body.nickname;
     var password = lib.sha512(req.body.pw);
 
-    console.log(await API.isUserInfoExist(email, nickname));
+
     if (await API.isUserInfoExist(email, nickname)) {
         res.send(`<script>
-                            alert('username or nickname is already exist');
-                            history.back();
-                        </script>`);
+                      alert('username or nickname is already exist');
+                      history.back();
+                  </script>`);
     } else {
         await API.createUser(email, password, nickname);
         res.send(`<script>
-                    alert("register ok");
-                    location.href = '/';
+                      alert("register ok");
+                      location.href = '/';
                   </script>`);
     }
 
