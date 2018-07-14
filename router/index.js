@@ -1,8 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var lib = require('../lib.js');
-var conn = require("../dbconnect.js").conn;
+const lib = require('../lib.js');
+const conn = require("../dbconnect.js").conn;
+
+const API = require('../api/user');
+console.log(API);
 
 router.get('/', function(req, res) {
     var isLogin = 0;
@@ -75,7 +78,7 @@ router.get('/register', function(req, res) {
     res.render('login.pug');
 });
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
 
     if (req.body.pw !== req.body.re_pw) {
         res.send(`<script>
@@ -88,24 +91,19 @@ router.post('/register', (req, res) => {
     var nickname = req.body.nickname;
     var password = lib.sha512(req.body.pw);
 
-    lib.isUserInfoExist(email, nickname, (result) => {
-        if (result) {
-            res.send(`<script>
+    console.log(await API.isUserInfoExist(email, nickname));
+    if (await API.isUserInfoExist(email, nickname)) {
+        res.send(`<script>
                             alert('username or nickname is already exist');
                             history.back();
                         </script>`);
-        }
-
-        else {
-            lib.insertUser(email, nickname, password);
-
-            var data = `<script>
-                            alert("register ok");
-                            location.href = '/';
-                        </script>`;
-            res.send(data);
-        }
-    });
+    } else {
+        await API.createUser(email, password, nickname);
+        res.send(`<script>
+                    alert("register ok");
+                    location.href = '/';
+                  </script>`);
+    }
 
 });
 
