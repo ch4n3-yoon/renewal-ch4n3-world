@@ -5,7 +5,6 @@ const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
 
 const API = require('../api/user');
-console.log(API);
 
 router.get('/', function(req, res) {
     var isLogin = 0;
@@ -21,7 +20,7 @@ router.get('/login', function(req, res) {
     res.render('login.pug');
 });
 
-router.post('/login', function(req, res) {
+router.post('/login', async (req, res) => {
 
     var sess = req.session;
 
@@ -37,7 +36,8 @@ router.post('/login', function(req, res) {
     password = lib.sha512(password);
 
     let result = await API.login(email, password);
-    if (result.length) {
+    if (result.dataValues) {
+        result = result.dataValues;
         sess.no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
