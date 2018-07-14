@@ -1,27 +1,24 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var lib = require('../lib.js');
-var conn = require("../dbconnect.js").conn;
+const lib = require('../lib.js');
+const conn = require("../dbconnect.js").conn;
+
+const API = require('../api/challenge');
+const FUNC = require('../api/function');
 
 router.get('/', async (req, res) => {
 
-    // 로그인을 하지 않았을 경우
-    // challenge listing 에 접근하지 못하도록 함.
-    if (!req.session.email) {
-        res.send(`<script>
-                    alert('Sorry, this page needs your login');
-                    history.back();
-                </script>`);
-        return 1;
-    }
+    if (!FUNC.isLogin(req, res))
+        return;
 
-    var email = req.session.email;
-    var no = req.session.no;
+    let email = req.session.email;
+    let no = req.session.no;
 
     var challenges = [];
     var categorys = [];
-
+    categorys = await API.getCategory();
+    console.log(categorys);
 
     // 문제 분야들 뭐가 있는지 가져옴
     var query = "select category from challenges where hidden = 0 group by category";
