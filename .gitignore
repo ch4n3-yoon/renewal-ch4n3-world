@@ -5,3 +5,5 @@ uploads
 config/dbSetting.js
 .gitignore
 .idea
+tmp
+logs
