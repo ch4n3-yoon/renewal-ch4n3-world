@@ -40,7 +40,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(express.static('public'));
 
 
-const root = require('./router/root.js');
+const root = require('./router/index.js');
 const user = require('./router/user.js');
 const challenge = require('./router/challenge.js');
 const rank = require('./router/rank.js');
