@@ -20,18 +20,6 @@ router.get('/', async (req, res) => {
     categorys = await API.getCategory();
     console.log(categorys);
 
-    // 문제 분야들 뭐가 있는지 가져옴
-    var query = "select category from challenges where hidden = 0 group by category";
-    conn.query(query, function(err, rows){
-        if (err) {
-            res.status(500);
-        } else {
-            for (var i = 0; i < rows.length; i++) {
-                categorys.push(rows[i].category);
-            }
-        }
-    });
-
     var getSolvers = async (no) => {
         return new Promise(async (resolve, reject) => {
 
@@ -79,7 +67,7 @@ router.get('/', async (req, res) => {
                     'solvers': rows[i].solvers,
                     'flag': rows[i].flag,
                     'hidden': rows[i].hidden,
-                    'solvers': await getSolvers(rows[i].no),
+                    'solvers': await API.getNumberOfSolver(rows[i].no),
                     'isSolvedChall': await isSolvedChall(rows[i].no, email)
                 };
                 challenges.push(challenge);
