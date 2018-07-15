@@ -8,6 +8,7 @@ class ChallengeAPI {
     async getByAuthor(author) { return await API.Challenges.findAll({where: {nickname: nickname}}) }
     async getPointByNo(no) { return await API.Challenges.findOne({attributes: [no], where: {no: no}}) }
     async getCategory() { return await API.Challenges.findAll({attributes: ['category'], where: {hidden: 0}, group: ['category']}) }
+    async getNumberOfSolver(challenge_no) { return await API.Solvers.count({where: {challenge_no: challenge_no}}) }
 }
 
 module.exports = new ChallengeAPI();
