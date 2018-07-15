@@ -57,6 +57,8 @@ router.get('/', async (req, res) => {
             res.status(500).json({ "status_code": 500, "status_message": "internal server error" });
         } else {
             for (var i = 0; i < rows.length; i++) {
+                let solvers = await API.getNumberOfSolver(rows[i].no);
+                solvers = solver.dataValues;
                 var challenge = {
                     'no': rows[i].no,
                     'title': rows[i].title,
@@ -67,7 +69,7 @@ router.get('/', async (req, res) => {
                     'solvers': rows[i].solvers,
                     'flag': rows[i].flag,
                     'hidden': rows[i].hidden,
-                    'solvers': await API.getNumberOfSolver(rows[i].no),
+                    'solvers': solvers,
                     'isSolvedChall': await isSolvedChall(rows[i].no, email)
                 };
                 challenges.push(challenge);
