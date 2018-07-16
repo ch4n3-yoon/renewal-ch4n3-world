@@ -21,7 +21,7 @@ router.get('/login', function(req, res) {
     res.render('login.pug');
 });
 
-router.post('/login', function(req, res) {
+router.post('/login', async (req, res) => {
 
     var sess = req.session;
 
@@ -38,11 +38,12 @@ router.post('/login', function(req, res) {
 
     let result = await API.login(email, password);
     if (result.length) {
-        sess.no = result.no;
+        sess.user_no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
-        sess.registertime = result.registertime;
+        sess.register_time = result.register_time;
         sess.admin = result.admin;
+
 
         sess.save();
 
