@@ -37,7 +37,9 @@ router.post('/login', async (req, res) => {
     password = lib.sha512(password);
 
     let result = await API.login(email, password);
-    if (result.length) {
+    if (result.dataValues) {
+        result = result.dataValues;
+
         sess.user_no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
