@@ -8,12 +8,12 @@ const API = require('../api/user');
 console.log(API);
 
 router.get('/', function(req, res) {
-    var isLogin = 0;
+    let isLogin = 0;
 
     if (req.session.email)
         isLogin = 1;
 
-    res.render('index', {isLogin: isLogin});
+    res.render('index', {isLogin: isLogin, session: req.session});
 });
 
 
