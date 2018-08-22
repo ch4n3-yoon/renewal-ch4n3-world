@@ -47,14 +47,13 @@ router.get('/', async (req, res) => {
     var main = async () => {
         return new Promise(async (resolve, reject) => {
 
-            if (!req.session.email) {
-                res.send("<script>alert('Login Please'); location.href='/login';</script>");
-                res.end();
-            }
+            let email = req.session.email;
+            let result = await isAdmin(email);
 
-            var email = req.session.email;
-            await isAdmin(email);
-            res.render('admin');
+            // 관리자가 확인된다면 admin.pug Rendering 실행
+            if (result) {
+                res.render('admin');
+            }
 
         });
     };
