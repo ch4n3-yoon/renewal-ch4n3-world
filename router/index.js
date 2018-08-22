@@ -3,6 +3,7 @@ const router = express.Router();
 
 const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
+const config = require('../config/serverConfig');
 
 const API = require('../api/user');
 console.log(API);
@@ -13,7 +14,7 @@ router.get('/', function(req, res) {
     if (req.session.email)
         isLogin = 1;
 
-    res.render('index', {isLogin: isLogin, session: req.session});
+    res.render('index', {isLogin: isLogin, session: req.session, adminPath: config.adminPath});
 });
 
 
