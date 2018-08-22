@@ -37,9 +37,9 @@ router.post('/login', async (req, res) => {
     password = lib.sha512(password);
 
     let result = await API.login(email, password);
-    if (result.dataValues) {
+    if (result) {
         result = result.dataValues;
-        
+
         sess.user_no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
@@ -48,14 +48,14 @@ router.post('/login', async (req, res) => {
 
         sess.save();
 
-        res.send(`<script>
+        return res.send(`<script>
                         alert('Successfully logged in');
                         location.href = '/';
                     </script>`);
     }
 
     else {
-        res.send(`<script>
+        return res.send(`<script>
                       alert('Login failed. Please check your email or password again');
                       history.back();
                   </script>`);
