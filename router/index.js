@@ -23,10 +23,10 @@ router.get('/login', function(req, res) {
 
 router.post('/login', async (req, res) => {
 
-    var sess = req.session;
+    let sess = req.session;
 
-    var email = req.body.email;
-    var password = req.body.pw;
+    let email = req.body.email;
+    let password = req.body.pw;
 
     /* 사용자가 email 혹은 pw를 보내지 않은 경우 */
     if (!email || !password) {
@@ -37,13 +37,14 @@ router.post('/login', async (req, res) => {
     password = lib.sha512(password);
 
     let result = await API.login(email, password);
-    if (result.length) {
+    if (result.dataValues) {
+        result = result.dataValues;
+        
         sess.user_no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
         sess.register_time = result.register_time;
         sess.admin = result.admin;
-
 
         sess.save();
 
