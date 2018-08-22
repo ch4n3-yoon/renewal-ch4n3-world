@@ -24,8 +24,8 @@ module.exports = {
                 return;
             }
 
-            var files;
-            var path = 'uploads/' + no;
+            let files;
+            let path = `./public/uploads/${no}`;
 
             await fs.stat(path, (err, stats) => {
                 // No such file or directory

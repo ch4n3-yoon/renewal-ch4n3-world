@@ -1,6 +1,6 @@
 var host = "localhost";
 var user = "root";
-var password = "password1234";
+var password = "rudska306";
 var port = 3306;
 var database = "test";
 

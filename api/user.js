@@ -10,7 +10,9 @@ class UserAPI {
     async login(email, password) { return await API.Users.findOne({where: {email: email, password: password}}); }
     async getList() { return await API.Users.findAll(); }
     async getEmailByNo(no) { return await API.Users.findOne({attributes: ['email'], where: {no: no}}) }
+    async getNicknameByNo(no) { return await API.Users.findOne({attributes: ['nickname'], where: {no: no}}) }
     async isUserInfoExist(email, nickname) { return await API.Users.count({where: { [Op.or]: [{email: email, nickname: nickname}]} }) }
+    async isAdmin(user_no) { return await API.Users.findOne({attributes: ['admin'], where: {no: user_no}}) }
 
     async createUser(email, password, nickname) {
         return await API.Users.create({email: email, password: password, nickname: nickname, register_time: Sequelize.fn('now')});

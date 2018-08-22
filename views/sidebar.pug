@@ -6,7 +6,12 @@
             a(href="/rank") Rank
         li
             a(href="/challenge") Challenges
-        
+
+        //- 관리자일때 관리자 기능 추가
+        if session.admin == true
+            li
+                a(href="/" + adminPath) ADMIN
+
         //- 로그인하지 않았을 때
         if isLogin == 0
             li

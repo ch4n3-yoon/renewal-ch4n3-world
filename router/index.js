@@ -5,15 +5,16 @@ const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
 
 const API = require('../api/user');
-console.log(API);
+const __admin_path__ = require('../config/serverConfig').adminPath;
+// console.log(API);
 
 router.get('/', function(req, res) {
-    var isLogin = 0;
-
+    let isLogin = 0;
     if (req.session.email)
         isLogin = 1;
 
-    res.render('index', {isLogin: isLogin});
+
+    res.render('index', {isLogin: isLogin, session: req.session, adminPath: __admin_path__});
 });
 
 
@@ -37,13 +38,13 @@ router.post('/login', async (req, res) => {
     password = lib.sha512(password);
 
     let result = await API.login(email, password);
-    if (result.length) {
+    // console.log(result);
+    if (result) {
         sess.user_no = result.no;
         sess.email = result.email;
         sess.nickname = result.nickname;
         sess.register_time = result.register_time;
         sess.admin = result.admin;
-
 
         sess.save();
 

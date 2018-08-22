@@ -1,188 +1,128 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
 
 const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
 
 const API = require('../api/challenge');
+const solversAPI = require('../api/solvers');
+const logAPI = require('../api/log');
 const FUNC = require('../api/function');
+
+
+let readDir = async (path, callback) => {
+    await fs.readdir(path, async (err, files) => {
+        if (err)
+            throw err;
+        callback(files);
+    });
+};
 
 router.get('/', async (req, res) => {
 
-    if (!FUNC.isLogin(req, res))
-        return;
-
-    let email = req.session.email;
-    let no = req.session.no;
-
-    var challenges = [];
-    var categorys = [];
-    categorys = await API.getCategory();
-    console.log(categorys);
-
-    var getSolvers = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select count(*) as solvers from solvers where solvedno = ?";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].solvers);
-            });
-
-        });
-    };
-
-    var isSolvedChall = async (no, email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select * from solvers where solvedno = ? and email = ? ";
-            var queryResult = await conn.query(query, [no, email], async (err, rows) => {
-                // 문제를 풀지 않은 상태
-                // console.log(rows);
-                if (rows.length == 0) {
-                    resolve(0);
-                } else {
-                    resolve(1);
-                }
-            });
-
-        });
-    }
-
-
-
-    var query = "SELECT * FROM `challenges`";
-    conn.query(query, async (err, rows) => {
-
-        if (err) {
-            res.status(500).json({ "status_code": 500, "status_message": "internal server error" });
-        } else {
-            for (var i = 0; i < rows.length; i++) {
-                let solvers = await API.getNumberOfSolver(rows[i].no);
-                solvers = solver.dataValues;
-                var challenge = {
-                    'no': rows[i].no,
-                    'title': rows[i].title,
-                    'point': rows[i].point,
-                    'category': rows[i].category,
-                    'description': rows[i].description,
-                    'author': rows[i].author,
-                    'solvers': rows[i].solvers,
-                    'flag': rows[i].flag,
-                    'hidden': rows[i].hidden,
-                    'solvers': solvers,
-                    'isSolvedChall': await isSolvedChall(rows[i].no, email)
-                };
-                challenges.push(challenge);
-            }
+    let getCategorys = async () => {
+        let sqlData = await API.getCategory();
+        let categorys = [];
+        for (let i = 0; i < sqlData.length; i++)
+        {
+            categorys.push(sqlData[i].dataValues.category);
         }
-        res.render('chall_list.pug', { 'challenges': challenges, 'categorys': categorys });
-    });
-
-    // res.render('chall_list.pug', { 'challenges': challenges });
-});
-
-
-
-
-
-
-
-router.get('/:no', async (req, res) => {
-
-    var getChallenge = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var query = "select * from challenges where no = ?";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    resolve(0);
-                }
-
-                else {
-                    var challenge = rows[0];
-                    challenge.files = await lib.getFiles(no);
-
-                    resolve(challenge);
-                }
-
-            });
-        });
+        return categorys;
     };
 
-    var main = async () => {
-        var no = Number(req.params.no);
-        var email = req.session.email;
+    let getSolvers = async (chall_no) => {
+        let sqlData = await API.getNumberOfSolver(chall_no);
+        return sqlData;
+    };
 
-        if (!email) {
-            res.send(`<script>
-                        alert('This page needs your login ㅠㅠ');
-                        location.href = '/login';
-                    </script>`);
+    let getChallenges = async (user_no) => {
+        let sqlData = await API.getChalls();
+        let challenges = [];
+
+        for (let i = 0; i < sqlData.length; i++)
+            challenges.push(sqlData[i].dataValues);
+
+        for (let i = 0; i < challenges.length; i++)
+        {
+            let chall_no = challenges[i].no;
+            challenges[i].isSolvedChall = await isSolvedChall(chall_no, user_no);
+            challenges[i].solvers = await getSolvers(chall_no);
+        }
+
+        return challenges;
+    };
+
+    let isSolvedChall = async (chall_no, user_no) => {
+        let sqlData = await API.isSolvedChall(chall_no, user_no);
+        return sqlData;
+    };
+
+    let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
             return;
-        }
 
-        var challenge = await getChallenge(no);
+        let user_no = req.session.user_no;
 
-        /*
-            1. 문제가 존재하지 않을 경우
-            2. 문제에 hidden이 적용되어 있는 경우
-        */
-        if (!challenge || challenge.hidden === 1) {
-            console.log(`[x] ${req.session.nickname} has accessed invalid path (/challenge/${no})`);
-            res.send("<script>alert('Invalid access detected'); history.back(); </script>");
-            return -1;
-        }
+        let challenges = await getChallenges(user_no);
+        let categorys = await getCategorys();
 
-        res.render('./chall', challenge);
-    }
+        res.render('chall_list.pug', { 'challenges': challenges, 'categorys': categorys });
+    };
 
     main();
 
 });
 
 
+// 2018.08.22 20:22 정상 작동 확인
+router.get('/:no', async (req, res) => {
+
+    let getChallenge = async (no) => {
+        let sqlData = await API.getByNo(no);
+        return sqlData.dataValues;
+    };
+
+    let main = async () => {
+
+        // if (!FUNC.isLogin(req, res))
+        //     return;
+
+        let no = Number(req.params.no);
+        let challenge = await getChallenge(no);
+
+        let path = `./public/uploads/${no}/`;
+        challenge.files = await fs.readdirSync(path);
+
+        if (!challenge || challenge.hidden === true) {
+            console.log(`[x] ${req.session.nickname} has accessed invalid path (/challenge/${no})`);
+            res.send("<script>alert('Invalid access detected'); history.back(); </script>");
+            return -1;
+        }
+
+        res.render('./chall', challenge);
+    };
+
+    main();
+});
+
+
 
 // 플래그 인증 페이지
-router.post('/:no/auth', async function(req, res) {
+router.post('/:no/auth', async (req, res) => {
 
-    // 로그인을 하지 않았을 경우
-    // challenge listing 에 접근하지 못하도록 함.
-    if (!req.session.email) {
-        res.send("<script>alert('Login plz'); location.href='/login'; </script>");
-        res.end();
-        return;
-    }
-
-    var no = Number(req.params.no);
-    var userFlag = req.body.flag;
-    var email = req.session.email;
-    var point = 0;
-
-    var query = "SELECT * FROM `challenges` WHERE `no` = ?";
-
-    var getFlag = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select flag from challenges where no = ? ";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].flag);
-            });
-
-        });
+    let getFlag = async (chall_no) => {
+        let sqlData = await API.getFlagByNo(chall_no);
+        return sqlData.dataValues.flag;
     };
 
-    var getTitle = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select title from challenges where no = ?";
-            var queryResult = conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].title);
-            });
-
-        });
+    let getTitle = async (chall_no) => {
+        let sqlData = await API.getTitleByNo(chall_no);
+        return sqlData.dataValues.title;
     };
 
-    var getChallPoint = async (no) => {
+    let getChallPoint = async (no) => {
         return new Promise(async (resolve, reject) => {
 
             var query = "select point from challenges where no = ?";
@@ -191,6 +131,13 @@ router.post('/:no/auth', async function(req, res) {
             });
 
         });
+    };
+
+    let setChallPoint = async (chall_no) => {
+        // int(round(min_score + (max_score - min_score) / (1 + (max(0, solves - 1) / 4.0467890) ** 3.84 )))
+        let solves = API.getNumberOfSolver(chall_no);
+        let point = Number(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2) );
+        return point;
     };
 
     var decreasePoint = (no) => {
@@ -210,93 +157,68 @@ router.post('/:no/auth', async function(req, res) {
         });
     }
 
-    var isAreadySolve = async (no, email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select * from solvers where solvedno = ? and email = ? ";
-            var queryResult = await conn.query(query, [no, email], async (err, rows) => {
-
-                if (rows.length >= 1)
-                    resolve(rows[0].solvetime);
-
-                else
-                    resolve(0);
-
-            });
-
-        });
+    let isAreadySolve = async (chall_no, user_no) => {
+        let sqlData = await API.isSolvedChall(chall_no, user_no);
+        console.log(sqlData);
     };
 
     // solvers 테이블에 insert 함
-    var insertIntoSolvers = async (no, email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "insert into solvers (solvedno, email, solvetime) ";
-            query += "values (?, ?, now())";
-
-            var queryResult = await conn.query(query, [no, email]);
-            resolve();
-
-        });
-    }
-
-    // authlog 테이블에 어떤 플래그를 입력했는지 insert 함
-    var insertIntoAuthlog = async (no, email, flag, state) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "insert into authlog (solvingno, email, enteredflag, state, trytime) ";
-            query += "values (?, ?, ?, ?, now())";
-
-            // 플래그를 입력했고 정답인 경우
-            if (state !== 0) {
-                state = 1;
-            }
-
-            var queryResult = await conn.query(query, [no, email, flag, state]);
-            resolve();
-
-        });
+    let insertIntoSolvers = async (chall_no, user_no) => {
+        return solversAPI.addSolver(chall_no, user_no);
     };
 
-    var main = async () => {
-        return new Promise(async (resolve, reject) => {
-            var solvetime = await isAreadySolve(no, email);
-            // var title = await getTitle(no);
+    // authlog 테이블에 어떤 플래그를 입력했는지 insert 함
+    // insertAuthLog(chall_no, user_no, user_flag, state)
+    let getSolvedLog = async (chall_no, user_no) => {
+        let sqlData = await API.getSolvedLog(chall_no, user_no);
+        return sqlData.dataValues;
+    };
 
-            // 문제를 풀지 않았을 때
-            if (solvetime == 0) {
+    let insertAuthLog = async (chall_no, user_no, user_flag, state) => {
+        return await logAPI.insertAuthLog(chall_no, user_no, user_flag, state);
+    };
 
-                var flag = await getFlag(no);
-                if (flag === userFlag) {
+    let main = async () => {
 
-                    insertIntoSolvers(no, email);       // solvers 테이블에 insert
-                    decreasePoint(no);                  // challenges 에 있는 해당 문제에 -10 점을 함
-                    insertIntoAuthlog(no, email, userFlag, 1);
-                                                        // authlog 테이블에 insert
+        // if (!FUNC.isLogin(req, res))
+        //     return;
 
-                    res.send(`<script>
+        let user_no = req.session.user_no;
+        let userFlag = req.body.flag;
+        let email = req.session.email;
+
+        let chall_no = Number(req.params.no);
+        let flag = await getFlag(chall_no);
+
+        console.log(flag);
+
+        if (await isAreadySolve(chall_no, user_no)) {
+            let logs = await getSolvedLog(chall_no, user_no);
+            res.send("<script>alert('you\\\'ve already solved it'); history.back(); </script>");
+            return console.log(logs);
+        }
+
+        if (flag === userFlag) {
+
+            // insertIntoSolvers(no, email);       // solvers 테이블에 insert
+            // decreasePoint(no);                  // challenges 에 있는 해당 문제에 -10 점을 함
+            // insertIntoAuthlog(no, email, userFlag, 1);
+            //                                     // authlog 테이블에 insert
+
+            res.send(`<script>
                                 alert('Correct flag!');
                                 location.href = '/challenge';
                             </script>`);
-                    res.end();
-                }
+            return res.end();
+        }
 
-                else {
-
-                    insertIntoAuthlog(no, email, userFlag, 0);
-                    res.send("<script>alert('wrong flag'); history.back(); </script>");
-                    res.end();
-                }
-            }
-
-            else {
-                res.send("<script>alert('you\\\'ve already solved it'); history.back(); </script>");
-            }
-
-            resolve();
-
-        });
+        else {
+            insertIntoAuthlog(no, email, userFlag, 0);
+            res.send("<script>alert('wrong flag'); history.back(); </script>");
+            res.end();
+        }
     };
+
 
 
     main();
