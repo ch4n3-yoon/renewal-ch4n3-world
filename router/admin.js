@@ -379,87 +379,61 @@ router.get('/createChallenge', async (req, res) => {
 
 router.post('/createChallenge', function(req, res) {
 
-    var filepath = "";
+    let createChallenge = async (title, author, category, description, flag, hidden) => {
+        return await API.createChallenge(title, author, category, description, flag, hidden)
+    };
 
-    var title = req.body.title;
-    var category = req.body.category;
-    var author = req.body.author;
-    var description = req.body.description;
-    var flag = req.body.flag;
-    var hidden = 0;
+    let getCurrentChallenge = async () => {
+        let sqlData = await API.getCurrentChall();
+        return sqlData.dataValues;
+    };
 
-    // hidden 이 체크되어 있는 경우 hidden 값을 1로 바꿈
-    if (req.body.hidden)
-        hidden = 1;
-
-    var files = req.files['file[]'];
-    var fileList = [];
-
-    // console.log(req.body);
-    // console.log(files);
-
-    // 가장 최신의 idx를 가져온 뒤, no = idx + 1 하여 디렉토리 생성
-    var no = 0;
-    var query = "select no from challenges order by no desc limit 1";
-    new Promise(function (resolve, reject) {
-        conn.query(query, function(err, rows) {
-            if (rows.length == 0)
-                resolve(0);
-            resolve(rows[0]);
-        });
-    }).then(function(row) {
-        if (row == 0)
-            return 1;
-        else
-            return row.no + 1;
-    }).then(function(no) {
-        filepath = 'uploads/' + no + '/';
-        // console.log(filepath);
-        return filepath;
-    }).then(function(filepath) {
-        fs.mkdir(filepath, function(err) {
-            console.log("[*] Created " + filepath);
-            if (err)
-                if (err.code == 'EEXIST')
-                    console.log("[x] " + filepath + " is arleady exist!");
-        });
-    }).then(function() {
-        // 업로드된 파일이 없는 경우 return 함.
+    let uploadFiles = async (path, files) => {
         if (!files)
-            return 0;
+            return;
 
-        for (var i = 0; i < files.length; i++)
+        if (typeof files.length === 'undefined') {
+            files = [files];
+        }
+
+        for (let i = 0; i < files.length; i++)
         {
-            filepath = filepath + files[i].name;
-            fileList.push(filepath);
-            files[i].mv(filepath, function(err) {
+
+            files[i].mv(path + files[i].name, (err) => {
                 if (err)
                     throw err;
             });
         }
-    }).then(function() {
-        fileList = fileList.join('|');
-        return fileList;
-    }).then(function(fileList) {
-        var query = "insert into `challenges` ";
-        query += "(title, point, category, description, author, solvers, flag, files, hidden) ";
-        query += "values (?, 500, ?, ?, ?, 0, ?, ?, ?) ";
+    };
 
-        // console.log(query);
-        // console.log([title, category, description, author, flag, fileList]);
+    let main = async () => {
+        let title = req.body.title;
+        let category = req.body.category;
+        let author = req.body.author;
+        let description = req.body.description;
+        let flag = req.body.flag;
+        let hidden = 0;
+        if (req.body.hidden)
+            hidden = 1;
+        let files = req.files['file[]'];
 
-        conn.query(query, [title, category, description, author, flag, fileList, hidden], function(err, rows) {
-            if (err){
-                throw err;
-            }
-        });
-    });
+        await createChallenge(title, author, category, description, flag, hidden);
 
+        let challenge = await getCurrentChallenge();
+        let chall_no = challenge.no;
+        let path = `./public/uploads/${chall_no}`;
+        await FUNC.makeDir(path);
+        await uploadFiles(path, files);
 
-    res.send(`<script>
+        res.send(`<script>
                 alert('Publish ok');
                 location.href = '/${__admin_path__}/challenge';
             </script>`);
+
+    };
+
+    main();
+
 });
 
 

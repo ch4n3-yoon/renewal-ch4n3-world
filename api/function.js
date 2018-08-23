@@ -25,3 +25,11 @@ exports.isLogin = (req, res) => {
 
     return 1;
 };
+
+exports.readDir = async (path) => {
+    return await fs.readdirSync(path);
+};
+
+exports.makeDir = async (path) => {
+    return await fs.mkdirSync(path);
+};

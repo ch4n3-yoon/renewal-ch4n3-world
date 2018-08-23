@@ -17,12 +17,12 @@ class ChallengeAPI {
     async getTitleByNo(no) { return await API.Challenges.findOne({attributes: ['title'], where: {no: no}}) }
     async getSolvedLog(chall_no, user_no) { return await API.Solvers.findOne({where: {challenge_no: chall_no, user_no: user_no}}) }
     async getCurrentChall() { return await API.Challenges.findOne({order: [['no', 'desc']], limit: 1}); }
-    async removeChall(chall_no) { return await API.Challenges.destroy({where: {no: chall_no}}) }
+    async deleteChall(chall_no) { return await API.Challenges.destroy({where: {no: chall_no}}) }
     async createChallenge(title, author, category, description, flag, hidden) {
         return await API.Challenges.create({title: title, author: author, category: category, description: description, flag: flag, hidden: hidden, point: 500 });
     }
-    async updateChallenge(no, title, author, category, description, flag, hidden) {
-        return await API.Challenges.update({ title: title, author: author, category: category, description: description, flag: flag, hidden: hidden}, { where: { 'no': no } });
+    async updateChallenge(chall_no, title, author, category, description, flag, hidden) {
+        return await API.Challenges.update({ title: title, author: author, category: category, description: description, flag: flag, hidden: hidden}, { where: { no: chall_no } });
     }
 }
 
