@@ -99,7 +99,8 @@ router.get('/challenge', async (req, res) => {
 });
 
 // 문제 수정 페이지
-// 2018.05.18 11:03 정상 작 확인
+// 2018.05.18 11:03 정상 작동 확인
+// 2018.08.23 13:49 정상 작동 확인
 router.get('/challenge/:chall_no', function(req, res) {
 
     let getChallenge = async (chall_no) => {
@@ -135,122 +136,59 @@ router.get('/challenge/:chall_no', function(req, res) {
 
 // 파일업로드 기능 추가
 // 2018.05.21 정상 작동 확인
-router.post('/challenge/:no', async (req, res) => {
+// 2018.08.23 15:05 정상 작동 확인
+router.post('/challenge/:challenge_no', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
+    let uploadFiles = async (path, files) => {
+        if (!files)
+            return;
 
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
+        if (typeof files.length === 'undefined') {
+            files = [files];
+        }
 
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
+        for (let i = 0; i < files.length; i++)
+        {
 
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
+            files[i].mv(path + files[i].name, (err) => {
+                if (err)
+                    throw err;
             });
-
-        });
+        }
     };
 
-    var email = req.session.email;
-    await isAdmin(email);
+    let updateChallenge = async (chall_no, title, author, category, description, flag, hidden) => {
+        return await API.updateChallenge(chall_no, title, author, category, description, flag, hidden);
+    };
 
-    no = Number(req.params.no);
+    let main = async () => {
+        let challenge_no = req.params.challenge_no;
+        let path = `./public/uploads/${challenge_no}/`;
 
-    // console.log(req.body);
-    var title = req.body.title;
-    var category = req.body.category;
-    var author = req.body.author;
-    var description = req.body.description;
-    var flag = req.body.flag;
+        let title = req.body.title;
+        let category = req.body.category;
+        let author = req.body.author;
+        let description = req.body.description;
+        let flag = req.body.flag;
 
-    var hidden = 0;
+        let hidden = 0;
+        if (req.body.hidden)
+            hidden = 1;
 
-    // hidden 이 체크되어 있는 경우 hidden 값을 1로 바꿈
-    if (req.body.hidden)
-        hidden = 1;
+        description = lib.replaceAll(description, "\r\n", "\n");
 
-    var files = req.files['file[]'];
-    var filepath = "uploads/" + no + "/";
-    var fileList = [];
+        let files = req.files['file[]'];
 
-
-
-    // 윈도우의 개행문자 \r\n을 \n으로 바꿈
-    description = lib.replaceAll(description, "\r\n", "<br>");
-    description = lib.replaceAll(description, "\n", "<br>");
-
-
-    // 업로드한 파일이 있다면 해당 분기를 실행함.
-    if (typeof files !== 'undefined')
-    {
-        new Promise(function(resolve, reject) {
-            // console.log(files);
-            // console.log(typeof files.length);
-
-            // 파일을 1개만 받았을 경우
-            if (typeof files.length === 'undefined') {
-                files = [files];
-            }
-
-            for (var i = 0; i < files.length; i++)
-            {
-                // console.log(2222);
-                // console.log(files[i]);
-                fileList.push(filepath + files[i].name);
-                files[i].mv(filepath + files[i].name, function(err) {
-                    if (err)
-                        throw err;
-                });
-            }
-
-            console.log(fileList);
-
-            resolve();
-
-        }).then(function() {
-            fs.readdir(filepath, function(err, items) {
-                console.log(items);
-                console.log("[*] readdir ./uploads/" + no);
-                return items;
-            });
-        }).then(function(files) {
-            if (files != undefined) {
-                if (files.length == 0)
-                    fileList = "";
-                else
-                    fileList = files.join("|");
-            }
-        });
-    }
-
-
-    console.log(fileList);
-    console.log(fileList.join("|"));
-
-    var query = "update challenges set ";
-    query += "title = ?, category = ?, author = ?, description = ?, files = ?, hidden = ?, flag = ? ";
-    query += "where no = ?";
-
-    new Promise(function(resolve, reject) {
-        conn.query(query, [title, category, author, description, fileList.join("|"), hidden, flag, no]);
-        resolve();
-    }).then(function() {
+        uploadFiles(path, files);
+        updateChallenge(challenge_no, title, author, category, description, flag, hidden);
         res.send(`<script>
                     alert('modify ok');
                     location.href = '/${__admin_path__}/challenge';
                 </script>`);
-    });
+    };
+
+    main();
+
 });
 
 
