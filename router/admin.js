@@ -1,10 +1,18 @@
-var express = require('express');
-var router = express.Router();
-
-var lib = require('../lib.js');
-var conn = require("../dbconnect.js").conn;
-
+const express = require('express');
 const fs = require('fs');
+const router = express.Router();
+
+const lib = require('../lib.js');
+const conn = require("../dbconnect.js").conn;
+const config = require('../config/serverConfig');
+
+const API = require('../api/challenge');
+const FUNC = require('../api/function');
+const solversAPI = require('../api/solvers');
+const logAPI = require('../api/log');
+const userAPI = require('../api/user');s
+
+const __admin_path__ = config.adminPath;
 
 /*
     관리자 페이지
@@ -14,48 +22,24 @@ const fs = require('fs');
      - flag auth log 체크 기능
 */
 
-var __admin_path__ = 'secretjuju';
+let isAdmin = async (user_no) => {
+    let sqlData = await userAPI.isAdmin(user_no);
+    return sqlData.dataValues.admin;
+};
 
 router.get('/', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
+    let main = async () => {
+        let user_no = req.session.user_no;
+        if (await isAdmin(user_no))
+        {
+            res.render('admin');
+        }
 
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-
-            });
-
-        });
-    };
-
-    var main = async () => {
-        return new Promise(async (resolve, reject) => {
-
-            let email = req.session.email;
-            let result = await isAdmin(email);
-
-            // 관리자가 확인된다면 admin.pug Rendering 실행
-            if (result) {
-                res.render('admin');
-            }
-
-        });
+        else
+        {
+            res.send("<script>alert('you are not admin'); location.href='/login'; </script>");
+        }
     };
 
     main();
