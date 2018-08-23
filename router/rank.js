@@ -1,42 +1,45 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var lib = require('../lib.js');
-var conn = require("../dbconnect.js").conn;
+const lib = require('../lib.js');
+const conn = require("../dbconnect.js").conn;
 
 // 랭킹 페이지
 // 2018.06.06 17:18 정상 작동 확인
 router.get('/', async (req, res) => {
 
-    var getUsers = async () => {
+    let getUsers = async () => {
         return new Promise(async (resolve, reject) => {
 
-            var query = "select *, ";
-            query += "(select sum((select point from challenges where challenges.no = solvers.solvedno)) from solvers where email = users.email) as point, ";
-            query += "(select solvetime from solvers where email = users.email order by solvetime desc limit 1) as lastsolvetime ";
-            query += "from users where admin = 0 order by point desc, lastsolvetime asc ";
+            let query =
+                "select *, " +
+                    "(select " +
+                        "sum((select point from challenges where challenges.no = solvers.challenge_no)) " +
+                    "from solvers where user_no = users.no) as point, " +
+                    "(select solve_time from solvers where user_no = users.no order by solve_time desc limit 1) as lastsolvetime " +
+                "from users where admin = 0 order by point desc, lastsolvetime asc";
 
-            var queryResult = conn.query(query, (err, rows) => {
+            await conn.query(query, (err, rows) => {
+                console.log(rows);
                 resolve(rows);
             });
-
         });
     };
 
 
-    var isLogin = () => {
+    let isLogin = () => {
         if (req.session.email)
             return 1;
         else
             return 0;
-    }
+    };
 
-    var setUsers = (rows) => {
+    let setUsers = (rows) => {
         return new Promise( (resolve, reject) => {
 
             // point 가 null 값을 갖고 있다면 0으로 바꾼다.
             // lastsolvetime 이 null 이라면 'not yet'으로 바꾼다.
-            for (var i = 0; i < rows.length; i++) {
+            for (let i = 0; i < rows.length; i++) {
                 if (rows[i].point === null)
                     rows[i].point = 0;
 
@@ -50,20 +53,14 @@ router.get('/', async (req, res) => {
         });
     };
 
-    var main = () => {
-        return new Promise(async (resolve, reject) => {
+    let main = async () => {
+        let users = await getUsers();
+        users = await setUsers(users);
 
-            var users = await getUsers();
-            var users = await setUsers(users);
-
-            res.render('./rank', {users: users, isLogin: isLogin()});
-
-            resolve();
-
-        });
+        res.render('./rank', {users: users, isLogin: isLogin(), session: req.session});
     };
 
-    main();
+    await main();
 
 });
 
