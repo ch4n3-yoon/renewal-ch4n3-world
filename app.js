@@ -1,9 +1,9 @@
-var express = require("express");
+const express = require("express");
 const path = require("path");
-var bodyParser = require('body-parser');
-var crypto = require("crypto");
-var conn = require("./dbconnect").conn;
-var lib = require("./lib");
+const bodyParser = require('body-parser');
+const crypto = require("crypto");
+const conn = require("./dbconnect").conn;
+const lib = require("./lib");
 const fileUpload = require('express-fileupload');
 const fs = require("fs");
 const session = require('express-session');
@@ -11,8 +11,8 @@ const schedule = require('node-schedule');
 
 const serverConfig = require('./config/serverConfig');
 
-var app = express();
-var route = express.Router();
+const app = express();
+const route = express.Router();
 
 app.use(express.Router());
 
@@ -39,17 +39,17 @@ app.use(fileUpload());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(express.static('public'));
 
-
-const root = require('./router/index.js');
+const adminPath = require('./config/serverConfig').adminPath;
+const index = require('./router/index.js');
 const user = require('./router/user.js');
 const challenge = require('./router/challenge.js');
 const rank = require('./router/rank.js');
-const secretjuju = require('./router/admin.js');
-app.use('/', root);
+const admin = require('./router/admin.js');
+app.use('/', index);
 app.use('/user', user);
 app.use('/challenge', challenge);
 app.use('/rank', rank);
-app.use('/secretjuju', secretjuju);
+app.use(`/${adminPath}`, admin);
 
 
 app.use( (req, res, next) => {
@@ -58,7 +58,7 @@ app.use( (req, res, next) => {
 
 
 // Run the CTF server
-var server = app.listen(serverConfig.port, () => {
+const server = app.listen(serverConfig.port, () => {
     console.log("[*] nCTF Server started at port " + serverConfig.port);
 });
 
