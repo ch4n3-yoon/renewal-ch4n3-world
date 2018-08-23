@@ -166,20 +166,9 @@ router.post('/:no/auth', async (req, res) => {
 
         if (flag === userFlag) {
 
-            // insertIntoSolvers(no, email);       // solvers 테이블에 insert
-            // decreasePoint(no);                  // challenges 에 있는 해당 문제에 -10 점을 함
-            // insertIntoAuthlog(no, email, userFlag, 1);
-            //                                     // authlog 테이블에 insert
-
-            console.log("insertIntoSolvers");
             await insertIntoSolvers(chall_no, user_no);
-
-            console.log("insertAuthLog");
             await insertAuthLog(chall_no, user_no, userFlag, "CORRECT");
-
-            console.log("setChallPoint");
             let newPoint = await setChallPoint(chall_no);
-            console.log(newPoint);
 
             res.send(`<script>
                                 alert('Correct flag!');
