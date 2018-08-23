@@ -33,7 +33,14 @@ html(lang="ko")
                     input.form-control(type="text", value=challenge.title, name="title")
                 div.form-group
                     lable Category
-                    input.form-control(type="text", value=challenge.category, name="category")
+                    select.form-control(name="category")
+                        option #{challenge.category}
+                        option Pwnable
+                        option Reversing
+                        option Webhacking
+                        option Crypto
+                        option Forensic
+                        option Network
                 div.form-group
                     lable Author
                     input.form-control(type="text", value=challenge.author, name="author")
