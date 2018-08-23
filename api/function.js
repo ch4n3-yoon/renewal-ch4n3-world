@@ -33,3 +33,10 @@ exports.readDir = async (path) => {
 exports.makeDir = async (path) => {
     return await fs.mkdirSync(path);
 };
+
+exports.removeFile = async (chall_no, filename) => {
+    filename = filename.replace('..', '');
+    filename = filename.replace('/', '');
+    let filepath = `./public/uploads/${chall_no}/${filename}`;
+    return await fs.unlinkSync(filepath);
+};

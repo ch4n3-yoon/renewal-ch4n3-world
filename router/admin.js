@@ -306,46 +306,22 @@ router.get('/challenge/:no/delete', async (req, res) => {
 });
 
 
-router.get('/challenge/:no/deletefile/:filename', function(req, res) {
-    no = Number(req.params.no);
-    filename = req.params.filename;
-    filepath = 'uploads/' + no + '/' + filename;
-    console.log("[*] deleting " + filepath);
+router.get('/challenge/:no/deletefile/:filename', async (req, res) => {
 
-    fs.stat(filepath, function (err, stats) {
-        if (err) {
-            if (err.code != "ENOENT") {
-                res.send(`<script>
-                            alert('No such file');
-                            location.href = '/${__admin_path__}/challenge/${no}';
-                        </script>`);
-                return console.error(err);
-            }
-        }
+    let chall_no = req.params.no;
+    let filename = req.params.filename;
 
-        console.log(stats);
+    let main = async () => {
 
-        fs.unlink(filepath, function(err) {
-            if (err) {
-                if(err.code != "ENOENT")
-                {
-                    return console.log(err);
-                }
-            } else {
-                var query = "update `challenges` set files = replace(files,'"+filepath+"|','') ";
-                query += "where no = ?";
-
-                conn.query(query, [no]);
-            }
-
-            console.log("[*] " + filepath + " deleted successfully");
-
-            res.send(`<script>
+        FUNC.removeFile(chall_no, filename);
+        res.send(`<script>
                         alert('${filepath} deleted successfully');
                         location.href = '/${__admin_path__}/challenge/${no}';
                     </script>`);
-        });
-    });
+    };
+
+    await main();
+
 });
 
 router.get('/createChallenge', async (req, res) => {
@@ -359,11 +335,11 @@ router.get('/createChallenge', async (req, res) => {
             return res.render('admin_chall_create');
     };
 
-    main();
+    await main();
 
 });
 
-router.post('/createChallenge', function(req, res) {
+router.post('/createChallenge', async (req, res) => {
 
     let createChallenge = async (title, author, category, description, flag, hidden) => {
         return await API.createChallenge(title, author, category, description, flag, hidden)
@@ -418,7 +394,7 @@ router.post('/createChallenge', function(req, res) {
 
     };
 
-    main();
+    await main();
 
 });
 
