@@ -354,7 +354,7 @@ router.get('/createChallenge', async (req, res) => {
         let user_no = req.session.user_no;
         if (!req.session.user_no || !await isAdmin(user_no))
             return res.send("<script>alert('This page need root permission.'); location.href='/login'; </script>");
-        
+
         else
             return res.render('admin_chall_create');
     };
@@ -407,7 +407,7 @@ router.post('/createChallenge', function(req, res) {
 
         let challenge = await getCurrentChallenge();
         let chall_no = challenge.no;
-        let path = `./public/uploads/${chall_no}`;
+        let path = `./public/uploads/${chall_no}/`;
         await FUNC.makeDir(path);
         await uploadFiles(path, files);
 
