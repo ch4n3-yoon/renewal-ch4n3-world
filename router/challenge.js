@@ -86,8 +86,8 @@ router.get('/:no', async (req, res) => {
 
     let main = async () => {
 
-        // if (!FUNC.isLogin(req, res))
-        //     return;
+        if (!FUNC.isLogin(req, res))
+            return;
 
         let no = Number(req.params.no);
         let challenge = await getChallenge(no);
@@ -117,45 +117,15 @@ router.post('/:no/auth', async (req, res) => {
         return sqlData.dataValues.flag;
     };
 
-    let getTitle = async (chall_no) => {
-        let sqlData = await API.getTitleByNo(chall_no);
-        return sqlData.dataValues.title;
-    };
-
-    let getChallPoint = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select point from challenges where no = ?";
-            var queryResult = conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].point);
-            });
-
-        });
-    };
-
     let setChallPoint = async (chall_no) => {
         // int(round(min_score + (max_score - min_score) / (1 + (max(0, solves - 1) / 4.0467890) ** 3.84 )))
         let solves = API.getNumberOfSolver(chall_no);
-        let point = Number(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2) );
-        return point;
+        let newPoint = Number(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2) );
+        await API.setPoint(chall_no, newPoint);
+
+        return newPoint;
     };
 
-    var decreasePoint = (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var point = await getChallPoint(no);
-
-            if (point > 10) {
-                var query = "update challenges set point = point - 10 where no = ?";
-                var queryResult = conn.query(query, [no]);
-                resolve(point - 10);
-            }
-
-            else
-                resolve(point);
-
-        });
-    }
 
     let isAreadySolve = async (chall_no, user_no) => {
         let sqlData = await API.isSolvedChall(chall_no, user_no);
@@ -168,7 +138,6 @@ router.post('/:no/auth', async (req, res) => {
     };
 
     // authlog 테이블에 어떤 플래그를 입력했는지 insert 함
-    // insertAuthLog(chall_no, user_no, user_flag, state)
     let getSolvedLog = async (chall_no, user_no) => {
         let sqlData = await API.getSolvedLog(chall_no, user_no);
         return sqlData.dataValues;
@@ -180,22 +149,19 @@ router.post('/:no/auth', async (req, res) => {
 
     let main = async () => {
 
-        // if (!FUNC.isLogin(req, res))
-        //     return;
+        if (!FUNC.isLogin(req, res))
+            return;
 
         let user_no = req.session.user_no;
         let userFlag = req.body.flag;
-        let email = req.session.email;
 
         let chall_no = Number(req.params.no);
         let flag = await getFlag(chall_no);
 
-        console.log(flag);
-
         if (await isAreadySolve(chall_no, user_no)) {
-            let logs = await getSolvedLog(chall_no, user_no);
-            res.send("<script>alert('you\\\'ve already solved it'); history.back(); </script>");
-            return console.log(logs);
+            // let logs = await getSolvedLog(chall_no, user_no);
+            await insertAuthLog(chall_no, user_no, userFlag, "ALREADY SOLVED");
+            return res.send("<script>alert('you\\\'ve already solved it'); history.back(); </script>");
         }
 
         if (flag === userFlag) {
@@ -205,6 +171,11 @@ router.post('/:no/auth', async (req, res) => {
             // insertIntoAuthlog(no, email, userFlag, 1);
             //                                     // authlog 테이블에 insert
 
+            await insertIntoSolvers(chall_no, user_no);
+            await insertAuthLog(chall_no, user_no, userFlag, "CORRECT");
+            let newPoint = await setChallPoint(chall_no);
+            console.log(newPoint);
+
             res.send(`<script>
                                 alert('Correct flag!');
                                 location.href = '/challenge';
@@ -213,15 +184,13 @@ router.post('/:no/auth', async (req, res) => {
         }
 
         else {
-            insertIntoAuthlog(no, email, userFlag, 0);
+            await insertAuthLog(chall_no, user_no, userFlag, "WRONG");
             res.send("<script>alert('wrong flag'); history.back(); </script>");
             res.end();
         }
     };
 
-
-
-    main();
+    await main();
 
 });
 

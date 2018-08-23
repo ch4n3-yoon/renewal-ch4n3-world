@@ -18,7 +18,7 @@ exports.isLogin = (req, res) => {
     if (!req.session.email) {
         res.send(`<script>
                     alert('Sorry, this page needs your login');
-                    history.back();
+                    location.href = '/login';
                 </script>`);
         return 0;
     }
