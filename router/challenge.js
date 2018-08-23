@@ -119,8 +119,8 @@ router.post('/:no/auth', async (req, res) => {
 
     let setChallPoint = async (chall_no) => {
         // int(round(min_score + (max_score - min_score) / (1 + (max(0, solves - 1) / 4.0467890) ** 3.84 )))
-        let solves = API.getNumberOfSolver(chall_no);
-        let newPoint = Number(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2) );
+        let solves = await API.getNumberOfSolver(chall_no);
+        let newPoint = Math.round(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2));
         await API.setPoint(chall_no, newPoint);
 
         return newPoint;
@@ -129,7 +129,7 @@ router.post('/:no/auth', async (req, res) => {
 
     let isAreadySolve = async (chall_no, user_no) => {
         let sqlData = await API.isSolvedChall(chall_no, user_no);
-        console.log(sqlData);
+        return sqlData;
     };
 
     // solvers 테이블에 insert 함
@@ -171,8 +171,13 @@ router.post('/:no/auth', async (req, res) => {
             // insertIntoAuthlog(no, email, userFlag, 1);
             //                                     // authlog 테이블에 insert
 
+            console.log("insertIntoSolvers");
             await insertIntoSolvers(chall_no, user_no);
+
+            console.log("insertAuthLog");
             await insertAuthLog(chall_no, user_no, userFlag, "CORRECT");
+
+            console.log("setChallPoint");
             let newPoint = await setChallPoint(chall_no);
             console.log(newPoint);
 
