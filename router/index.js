@@ -6,7 +6,6 @@ const conn = require("../dbconnect.js").conn;
 const config = require('../config/serverConfig');
 
 const API = require('../api/user');
-console.log(API);
 
 router.get('/', function(req, res) {
     let isLogin = 0;

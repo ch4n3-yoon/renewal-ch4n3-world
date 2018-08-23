@@ -350,31 +350,18 @@ router.get('/challenge/:no/deletefile/:filename', function(req, res) {
 
 router.get('/createChallenge', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
+    let main = async () => {
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))s
+            return res.send("<script>alert('This page need root permission.'); location.href='/login'; </script>");
 
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
 
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
+        else
+            return res.render('admin_chall_create');
     };
 
-    var email = req.session.email;
-    if (await isAdmin(email)) {
-        res.render('admin_chall_create');
-    }
-
+    main();
+    
 });
 
 router.post('/createChallenge', function(req, res) {
