@@ -76,7 +76,7 @@ router.get('/challenge', async (req, res) => {
         let categorys = [];
         for (let i = 0; i < sqlData.length; i++)
         {
-            categorys.push(sqlData[i].dataValues);
+            categorys.push(sqlData[i].dataValues.category);
         }
 
         return categorys;
@@ -90,6 +90,7 @@ router.get('/challenge', async (req, res) => {
 
         let challenges = await getChallenges();
         let categorys = await getCategorys();
+
         res.render('./admin_chall_list', { 'challenges': challenges, 'categorys': categorys });
     };
 
@@ -101,11 +102,6 @@ router.get('/challenge', async (req, res) => {
 // 2018.05.18 11:03 정상 작 확인
 router.get('/challenge/:chall_no', function(req, res) {
 
-    if (!req.session.email) {
-        res.send("<script>alert('This page requires admin authority'); location.href='/login';</script>");
-        res.end();
-    }
-
     let getChallenge = async (chall_no) => {
         let sqlData = await API.getByNo(chall_no);
         return sqlData.dataValues;
@@ -115,16 +111,20 @@ router.get('/challenge/:chall_no', function(req, res) {
 
         let user_no = req.session.user_no;
         if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
+        {
+            res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
+            return res.end();
+        }
+
 
         let chall_no = Number(req.params.chall_no);
         let challenge = await getChallenge(chall_no);
 
-        let path = `./public/uplaods/${chall_no}/`;
+        let path = `./public/uploads/${chall_no}/`;
         challenge.files = await FUNC.readDir(path);
 
         challenge.description = lib.replaceAll(challenge.description, "<br>", "\n");
-        res.render('admin_chall_view', challenge);
+        res.render('admin_chall_view', {'challenge': challenge});
     };
 
     main();
