@@ -50,98 +50,47 @@ router.get('/', async (req, res) => {
 // 문제 관리하는 페이지
 // 2018.05.18 00:39 정상 작동 확인
 router.get('/challenge', async (req, res) => {
-    var challenges = [];
-    var categorys = [];
 
-    if (!req.session.email) {
-        res.send("<script>alert('This page requires admin authority'); location.href='/login';</script>");
-        res.end();
-    }
-
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-
-            });
-
-        });
+    let getSolvers = async (chall_no) => {
+        return await API.getNumberOfSolver(chall_no);
     };
 
-    var getAllCategorys = async () => {
-        return new Promise(async (resolve, reject) => {
+    let getChallenges = async () => {
+        let sqlData = await API.getAllChalls();
+        let challenges = [];
+        for (let i = 0; i < sqlData.length; i++)
+        {
+            challenges.push(sqlData[i].dataValues);
+        }
 
-            var categorys = [];
+        for (let i = 0; i < challenges.length; i++)
+        {
+            challenges[i].solvers = await getSolvers(challenges[i].no);
+        }
 
-            var query = "select category from challenges group by category";
-            var queryResult = await conn.query(query, async (err, rows) => {
-                for (var i = 0; i < rows.length; i++) {
-                    categorys.push(rows[i].category);
-                }
-
-                resolve(categorys);
-            });
-
-        });
+        return challenges;
     };
 
-    var getSolvers = async (no) => {
-        return new Promise(async (resolve, reject) => {
+    let getCategorys = async () => {
+        let sqlData = await API.getAllCategorys();
+        let categorys = [];
+        for (let i = 0; i < sqlData.length; i++)
+        {
+            categorys.push(sqlData[i].dataValues);
+        }
 
-            var query = "select count(*) as solvers from solvers where solvedno = ?";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].solvers);
-            });
-
-        });
+        return categorys;
     };
 
-    var getAllChallenges = async () => {
-        return new Promise(async (resolve, reject) => {
+    let main = async () => {
 
-            var challenges = [];
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))
+            return res.send("<script>alert('This page need your admin permission.'); location.href='/login';</script>");
 
-            var query = "select * from challenges";
-            var queryResult = await conn.query(query, async (err, rows) => {
-                resolve(rows);
-            });
-
-        });
-    }
-
-
-    var main = async () => {
-        return new Promise(async (resolve, reject) => {
-
-            var email = req.session.email;
-            await isAdmin(email);
-
-            var categorys = await getAllCategorys();
-            var challenges = await getAllChallenges();
-
-            for (var i = 0; i < challenges.length; i++) {
-                challenges[i].solvers = await getSolvers(challenges[i].no);
-            }
-
-
-            res.render('./admin_chall_list', { 'challenges': challenges, 'categorys': categorys });
-        });
+        let challenges = await getChallenges();
+        let categorys = await getCategorys();
+        res.render('./admin_chall_list', { 'challenges': challenges, 'categorys': categorys });
     };
 
     main();
