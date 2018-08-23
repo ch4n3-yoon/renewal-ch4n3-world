@@ -10,7 +10,7 @@ const API = require('../api/challenge');
 const FUNC = require('../api/function');
 const solversAPI = require('../api/solvers');
 const logAPI = require('../api/log');
-const userAPI = require('../api/user');s
+const userAPI = require('../api/user');
 
 const __admin_path__ = config.adminPath;
 
@@ -98,85 +98,37 @@ router.get('/challenge', async (req, res) => {
 });
 
 // 문제 수정 페이지
-// 2018.05.18 11:03 정상 작동 확인
-router.get('/challenge/:no', function(req, res) {
-    // DB에서 빼온 값을 저장하기 위한 변수 선언
-    no = Number(req.params.no);
-    console.log("[*] Admin access to " + no);
-    var files = [];
+// 2018.05.18 11:03 정상 작 확인
+router.get('/challenge/:chall_no', function(req, res) {
 
     if (!req.session.email) {
         res.send("<script>alert('This page requires admin authority'); location.href='/login';</script>");
         res.end();
     }
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
+    let getChallenge = async (chall_no) => {
+        let sqlData = await API.getByNo(chall_no);
+        return sqlData.dataValues;
     };
 
+    let main = async () => {
 
-    new Promise(function(resolve, reject) {
-        fs.readdir('uploads/' + no, function(err, items) {
-            // console.log(items);
-            console.log("[*] readdir ./uploads/" + no);
-            resolve(items);
-        });
-    }).then(function(items) {
-        files = items;
-    });
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))
+            return res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
 
-    new Promise(async (resolve, reject) => {
+        let chall_no = Number(req.params.chall_no);
+        let challenge = await getChallenge(chall_no);
 
-        var query = "SELECT * FROM `challenges` WHERE `no`=?";
-        result = conn.query(query, [no], function(err, rows) {
-            if (err)
-                reject(err);
+        let path = `./public/uplaods/${chall_no}/`;
+        challenge.files = await FUNC.readDir(path);
 
-            // 선언한 변수에 DB에서 나온 값들을 저장함
-            challenge = {
-                'no': rows[0].no,
-                'title': rows[0].title,
-                'point': rows[0].point,
-                'category': rows[0].category,
-                'description': rows[0].description,
-                'author': rows[0].author,
-                'solvers': rows[0].solvers,
-                'flag': rows[0].flag,
-                'hidden': rows[0].hidden,
-            }
-
-            challenge.files = files;
-            challenge.description = lib.replaceAll(challenge.description, "<br>", "\n");
-
-            resolve(challenge);
-        });
-    }).then(async (challenge) => {
-        var email = req.session.email;
-        await isAdmin(email);
+        challenge.description = lib.replaceAll(challenge.description, "<br>", "\n");
         res.render('admin_chall_view', challenge);
-        // console.log({ no: no, title: title, description: description });
-    });
+    };
+
+    main();
+
 });
 
 
