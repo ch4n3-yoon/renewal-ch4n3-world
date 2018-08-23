@@ -315,8 +315,8 @@ router.get('/challenge/:no/deletefile/:filename', async (req, res) => {
 
         FUNC.removeFile(chall_no, filename);
         res.send(`<script>
-                        alert('${filepath} deleted successfully');
-                        location.href = '/${__admin_path__}/challenge/${no}';
+                        alert('File deleted successfully');
+                        location.href = '/${__admin_path__}/challenge/${chall_no}';
                     </script>`);
     };
 
