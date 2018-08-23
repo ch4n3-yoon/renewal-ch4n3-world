@@ -85,9 +85,9 @@ router.post('/register', async (req, res) => {
                 </script>`);
     }
 
-    var email = req.body.email;
-    var nickname = req.body.nickname;
-    var password = lib.sha512(req.body.pw);
+    let email = req.body.email.trim();
+    let nickname = req.body.nickname.trim();
+    let password = lib.sha512(req.body.pw);
 
 
     if (await API.isUserInfoExist(email, nickname)) {
