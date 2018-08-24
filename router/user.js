@@ -19,7 +19,7 @@ router.get('/:no', async (req, res) => {
         if (!sqlData)
             return 0;
         let solve_time = sqlData.dataValues.solve_time;
-        return await solversAPI.getSolvedRank(solve_time);
+        return await solversAPI.getSolvedRank(chall_no, solve_time);
     };
 
     let getSolvedChallenges = async (user_no) => {
