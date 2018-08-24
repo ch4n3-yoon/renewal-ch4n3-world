@@ -28,9 +28,8 @@ html(lang="ko")
                             lable Password
                             input.form-control(type="text", name="password", placeholder="수정하지 않으려면 공란으로")
 
-
                         div.form-group
-                            if user.admin == 1
+                            if user.admin === true
                                 input(type="checkbox", class="form-check-input", name="admin", checked)
                             else 
                                 input(type="checkbox", class="form-check-input", name="admin")

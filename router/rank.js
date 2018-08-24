@@ -9,7 +9,7 @@ const conn = require("../dbconnect.js").conn;
 router.get('/', async (req, res) => {
 
     let getUsers = async () => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
 
             let query =
                 "select *, " +

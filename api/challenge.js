@@ -13,8 +13,8 @@ class ChallengeAPI {
     async getAllCategorys() { return await API.Challenges.findAll({attributes: ['category'], group: ['category'], order: [['category', 'desc']]}) }
     async getNumberOfSolver(challenge_no) { return await API.Solvers.count({where: {challenge_no: challenge_no}}) }
     async isSolvedChall(challenge_no, user_no) { return await API.Solvers.count({where: {challenge_no:challenge_no, user_no: user_no}}) }
-    async getFlagByNo(no) { return await API.Challenges.findOne({attributes: ['flag'], where: {no: no}}) }
-    async getTitleByNo(no) { return await API.Challenges.findOne({attributes: ['title'], where: {no: no}}) }
+    async getFlagByNo(chall_no) { return await API.Challenges.findOne({attributes: ['flag'], where: {no: chall_no}}) }
+    async getTitleByNo(chall_no) { return await API.Challenges.findOne({attributes: ['title'], where: {no: chall_no}}) }
     async getSolvedLog(chall_no, user_no) { return await API.Solvers.findOne({where: {challenge_no: chall_no, user_no: user_no}}) }
     async getCurrentChall() { return await API.Challenges.findOne({order: [['no', 'desc']], limit: 1}); }
     async deleteChall(chall_no) { return await API.Challenges.destroy({where: {no: chall_no}}) }
@@ -24,6 +24,7 @@ class ChallengeAPI {
     async updateChallenge(chall_no, title, author, category, description, flag, hidden) {
         return await API.Challenges.update({ title: title, author: author, category: category, description: description, flag: flag, hidden: hidden}, { where: { no: chall_no } });
     }
+    async setPoint(chall_no, point) { return await API.Challenges.update({point: point}, {where: {no: chall_no}}) }
 }
 
 /*

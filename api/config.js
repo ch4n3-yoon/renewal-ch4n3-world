@@ -52,7 +52,7 @@ API.Authlog = API.define('authlog', {
     challenge_no: { type: Sequelize.INTEGER(10).UNSIGNED, allowNull: false },
     user_no: { type: Sequelize.INTEGER(10).UNSIGNED, allowNull: false },
     user_flag: { type: Sequelize.STRING },
-    state: { type: Sequelize.ENUM('CORRECT', 'WRONG'), allowNull: false },
+    state: { type: Sequelize.ENUM('CORRECT', 'WRONG', 'ALREADY SOLVED'), allowNull: false },
     try_time: Sequelize.DATE
 });
 
