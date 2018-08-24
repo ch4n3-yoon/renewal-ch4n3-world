@@ -105,6 +105,8 @@ router.get('/challenge/:chall_no', function(req, res) {
 
     let getChallenge = async (chall_no) => {
         let sqlData = await API.getByNo(chall_no);
+        if (!sqlData)
+            return 0;
         return sqlData.dataValues;
     };
 
@@ -112,14 +114,13 @@ router.get('/challenge/:chall_no', function(req, res) {
 
         let user_no = req.session.user_no;
         if (!req.session.user_no || !await isAdmin(user_no))
-        {
-            res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
-            return res.end();
-        }
+            return res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
 
 
         let chall_no = Number(req.params.chall_no);
         let challenge = await getChallenge(chall_no);
+        if (!challenge)
+            return res.send("<script>alert('Invalid access detected'); history.back(); </script>");
 
         let path = `./public/uploads/${chall_no}/`;
         challenge.files = await FUNC.readDir(path);
