@@ -492,80 +492,47 @@ router.get('/correctkey', async (req, res) => {
 // 관리자의 사용자 관리 페이지
 router.get('/user', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
+    let getUsers = async (callback) => {
+        return new Promise(async (resolve) => {
 
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
+            let query =
+                "select *, " +
+                "(select " +
+                "sum((select point from challenges where challenges.no = solvers.challenge_no)) " +
+                "from solvers where user_no = users.no) as point, " +
+                "(select solve_time from solvers where user_no = users.no order by solve_time desc limit 1) as lastsolvetime " +
+                "from users where admin = 0 order by point desc, lastsolvetime asc";
 
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
+            await conn.query(query, (err, rows) => {
+                resolve(callback(rows));
             });
-
         });
     };
 
+    let setUsers = async (rows) => {
 
-    var getUsers = async () => {
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].point === null)
+                rows[i].point = 0;
 
-        return new Promise(async (resolve, reject) => {
+            if (rows[i].lastsolvetime === null)
+                rows[i].lastsolvetime = '😪';
+        }
 
-            var query = "select *, ";
-            query += "(select sum((select point from challenges where challenges.no = solvers.solvedno)) from solvers where email = users.email) as point, ";
-            query += "(select solvetime from solvers where email = users.email order by solvetime desc limit 1) as lastsolvetime ";
-            query += "from users order by point desc ";
-
-            var queryResult = await conn.query(query, (err, rows) => {
-                resolve(rows);
-            });
-
-        });
-
+        return rows;
     };
 
-    var setUsers = async (rows) => {
+    let main = async () => {
 
-        return new Promise(async (resolve, reject) => {
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))
+            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
 
-            // point 가 null 값을 갖고 있다면 0으로 바꾼다.
-            // lastsolvetime 이 null 이라면 'not yet'으로 바꾼다.
-            for (var i = 0; i < rows.length; i++) {
-                if (rows[i].point === null)
-                    rows[i].point = 0;
-
-                if (rows[i].lastsolvetime === null)
-                    rows[i].lastsolvetime = '😪';
-            }
-
-            resolve(rows);
-
-        });
-
-    };
-
-    var main = async () => {
-        var users = await getUsers();
-        var users = await setUsers(users);
-
+        let users = await getUsers(setUsers);
         res.render('./admin_user_list', {users: users});
     };
 
-    var email = req.session.email;
-    if (await isAdmin(email)) {
-        main();
-    }
+    await main();
 
 });
 
