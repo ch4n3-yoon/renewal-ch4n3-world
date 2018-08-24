@@ -429,6 +429,11 @@ router.get('/wrongkey', async (req, res) => {
     };
 
     let main = async () => {
+
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))
+            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
+
         let logs =  await getWrongAuthlog();
         res.render('admin_wrongkey', {logs: logs});
     };
@@ -468,6 +473,11 @@ router.get('/correctkey', async (req, res) => {
     };
 
     let main = async () => {
+
+        let user_no = req.session.user_no;
+        if (!req.session.user_no || !await isAdmin(user_no))
+            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
+
         let logs =  await getWrongAuthlog();
         res.render('admin_correctkey', {logs: logs});
     };
