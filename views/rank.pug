@@ -15,7 +15,7 @@ html(lang="ko")
             #page-content-wrapper
                 .container-fluid
                     h1 Hackingcamp CTF Rank
-                    P 순위는 잘생긴 순이 아니라 포인트 순입니다.
+                    P 순위는 잘생긴 순이 아니라 포인트 순입니다. 10초 마다 reload 됩니다.
                     table.table
                         tr
                             th #
@@ -45,3 +45,6 @@ html(lang="ko")
             |  e.preventDefault();
             |  $("#wrapper").toggleClass("toggled");
             | });
+            |
+            | setTimeout("location.reload()",10000);
+
