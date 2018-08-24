@@ -79,7 +79,7 @@ router.get('/', async (req, res) => {
 router.get('/:no', async (req, res) => {
 
     let getChallenge = async (no) => {
-        let sqlData = await API.getNotHiddenChallenge(no);
+        let sqlData = await API.getByNo(no);
         if (!sqlData)
             return 0;
         return sqlData.dataValues;
@@ -98,7 +98,7 @@ router.get('/:no', async (req, res) => {
         let path = `./public/uploads/${no}/`;
         challenge.files = await fs.readdirSync(path);
 
-        if (!challenge || challenge.hidden === true) {
+        if (challenge.hidden === true) {
             console.log(`[x] ${req.session.nickname} has accessed invalid path (/challenge/${no})`);
             res.send("<script>alert('Invalid access detected'); history.back(); </script>");
             return -1;
