@@ -27,12 +27,12 @@ html(lang="ko")
                                 - index++;
                                 - var check = 0;
                                 each solvedChallenge in solvedChallenges
-                                    if solvedChallenge.no == allChallenge.no
-                                        td #{solvedChallenge.solvetime}
+                                    if solvedChallenge.challenge_no === allChallenge.no
+                                        td #{solvedChallenge.solve_time}
                                         td #{solvedChallenge.rank}
                                         - check = 1;
 
-                                if check == 0
+                                if check === 0
                                     td 😪
                                     td 😪
                                     
