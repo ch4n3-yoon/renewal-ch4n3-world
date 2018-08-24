@@ -6,6 +6,7 @@ const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
 
 const API = require('../api/challenge');
+const userAPI = require('../api/user');
 const solversAPI = require('../api/solvers');
 const logAPI = require('../api/log');
 const FUNC = require('../api/function');
@@ -85,10 +86,33 @@ router.get('/:no', async (req, res) => {
         return sqlData.dataValues;
     };
 
+    let getNickname = async (user_no) => {
+        let sqlData = await userAPI.getByNo(user_no);
+        if (!sqlData)
+            return 0;
+        return sqlData.dataValues.nickname;
+    };
+
+    let getSolvedUsers = async (chall_no) => {
+        let sqlData = await API.getSolvedUsers(chall_no);
+        if (!sqlData)
+            return 0;
+
+        let solvers = [];
+        for (let i = 0; i < sqlData.length; i++)
+        {
+            let user_no = sqlData[i].user_no;
+            solvers.push(sqlData[i]);
+            solvers[i].nickname = await getNickname(user_no);
+        }
+
+        return solvers;
+    };
+
     let main = async () => {
 
-        if (!FUNC.isLogin(req, res))
-            return;
+        // if (!FUNC.isLogin(req, res))
+        //     return;
 
         let no = Number(req.params.no);
         let challenge = await getChallenge(no);
@@ -104,7 +128,9 @@ router.get('/:no', async (req, res) => {
             return -1;
         }
 
-        res.render('./chall', challenge);
+        let solvers = await getSolvedUsers(no);
+
+        res.render('chall', {challenge: challenge, solvers: solvers});
     };
 
     main();
@@ -140,11 +166,6 @@ router.post('/:no/auth', async (req, res) => {
         return solversAPI.addSolver(chall_no, user_no);
     };
 
-    // authlog 테이블에 어떤 플래그를 입력했는지 insert 함
-    let getSolvedLog = async (chall_no, user_no) => {
-        let sqlData = await API.getSolvedLog(chall_no, user_no);
-        return sqlData.dataValues;
-    };
 
     let insertAuthLog = async (chall_no, user_no, user_flag, state) => {
         return await logAPI.insertAuthLog(chall_no, user_no, user_flag, state);

@@ -12,31 +12,46 @@ html(lang="ko")
             h1 Hackingcamp CTF
             hr
 
-            h2.display-1 #{title}
+            h2.display-1 #{challenge.title}
             blockquote
-                div.mb-0 !{description}
-                footer #{author}
+                div.mb-0 !{challenge.description}
+                footer #{challenge.author}
             br
             br
             
             
-            if files
+            if challenge.files
                 label Files
-                each file in files
+                each file in challenge.files
                     p 
-                        a(href="/uploads/" + no + "/" + file)= file
+                        a(href="/uploads/" + challenge.no + "/" + file)= file
 
 
             br
             br
 
-            form.form-group(action="/challenge/" + no + "/auth", method="post")
+            form.form-group(action="/challenge/" + challenge.no + "/auth", method="post")
                 label Flag
                 .row
                     .col-md-8
                         input.form-control(name="flag") 
                     .col-md-4
                         button.btn(type="submit" value="") Flag Check
+            br
+
+            h3 Solvers
+            table.table
+                tr
+                    th #
+                    th Team
+                    th Solved time
+                - var i = 1;
+                each solver in solvers
+                    tr
+                        td #{i}
+                        td #{solver.nickname}
+                        td #{solver.solve_time}
+                    - i ++;
             br
             a.btn.btn-primary(href="/challenge") list
             
