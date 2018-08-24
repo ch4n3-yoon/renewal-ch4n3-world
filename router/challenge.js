@@ -79,7 +79,7 @@ router.get('/', async (req, res) => {
 router.get('/:no', async (req, res) => {
 
     let getChallenge = async (no) => {
-        let sqlData = await API.getByNo(no);
+        let sqlData = await API.getNotHiddenChallenge(no);
         if (!sqlData)
             return 0;
         return sqlData.dataValues;
