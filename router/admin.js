@@ -441,81 +441,38 @@ router.get('/wrongkey', async (req, res) => {
 // 맞은 플래그 인증 로그
 router.get('/correctkey', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
+    let getNickname = async (user_no) => {
+        let sqlData = await userAPI.getNicknameByNo(user_no);
+        if (!sqlData)
+            return 0;
+        return sqlData.dataValues.nickname;
     };
 
-    var email2nickname = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select nickname from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-                resolve(rows[0].nickname);
-            });
-
-        });
+    let getTitle = async (chall_no) => {
+        let sqlData = await API.getByNo(chall_no);
+        if (sqlData)
+            return sqlData.dataValues.title;
+        return "undefined";
     };
 
-    var getTitle = async (no) => {
-        return new Promise(async (resolve, reject) => {
+    let getWrongAuthlog = async () => {
+        let sqlData = await logAPI.getCorrectLogs();
+        let logs = [];
+        for (let i = 0; i < sqlData.length; i++) {
+            logs.push(sqlData[i].dataValues);
+            logs[i].title = await getTitle(logs[i].challenge_no);
+            logs[i].nickname = await getNickname(logs[i].user_no);
+        }
 
-            var query = "select title from challenges where no = ? ";
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0].title);
-            });
-
-        });
+        return logs;
     };
 
-    var getCorrectAuthlog = async () => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select * from authlog where state = 1 order by no desc";
-            var queryResult = await conn.query(query, async (err, rows) => {
-
-                for (var i = 0; i < rows.length; i++) {
-                    rows[i].title = await getTitle(rows[i].solvingno);
-                    rows[i].nickname = await email2nickname(rows[i].email);
-                }
-
-                resolve(rows);
-            });
-
-        });
+    let main = async () => {
+        let logs =  await getWrongAuthlog();
+        res.render('admin_correctkey', {logs: logs});
     };
 
-    var main = async () => {
-        return new Promise(async (resolve, reject) => {
-            var logs =  await getCorrectAuthlog();
-            res.render('admin_correctkey', {logs: logs});
-        });
-    };
-
-    var email = req.session.email;
-    if (await isAdmin(email)) {
-        main();
-    }
+    await main();
 
 });
 
