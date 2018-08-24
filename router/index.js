@@ -79,7 +79,7 @@ router.get('/register', function(req, res) {
 router.post('/register', async (req, res) => {
 
     if (req.body.pw !== req.body.re_pw) {
-        res.send(`<script>
+        return res.send(`<script>
                     alert('Your two passwords are different.');
                     history.back();
                 </script>`);
