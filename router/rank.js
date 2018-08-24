@@ -20,7 +20,6 @@ router.get('/', async (req, res) => {
                 "from users where admin = 0 order by point desc, lastsolvetime asc";
 
             await conn.query(query, (err, rows) => {
-                console.log(rows);
                 resolve(rows);
             });
         });
