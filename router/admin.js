@@ -501,7 +501,7 @@ router.get('/user', async (req, res) => {
                 "sum((select point from challenges where challenges.no = solvers.challenge_no)) " +
                 "from solvers where user_no = users.no) as point, " +
                 "(select solve_time from solvers where user_no = users.no order by solve_time desc limit 1) as lastsolvetime " +
-                "from users where admin = 0 order by point desc, lastsolvetime asc";
+                "from users where 1 order by point desc, lastsolvetime asc";
 
             await conn.query(query, (err, rows) => {
                 resolve(callback(rows));
@@ -540,103 +540,63 @@ router.get('/user', async (req, res) => {
 
 router.get('/user/:no', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows.length === 0) {
-                    res.send("<script>alert('Login is required.'); location.href='/login';</script>");
-                    res.end();
-                }
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
+    let getUserByNo = async (user_no) => {
+        let sqlData = await userAPI.getByNo(user_no);
+        if (!sqlData)
+            return 0;
+        return sqlData.dataValues;
     };
 
-    var no = Number(req.params.no);
+    let main = async () => {
+        let user_no = Number(req.params.no);
+        let user = await getUserByNo(user_no);
+        if (!user)
+            return res.send("<script>alert('Invalid access detected'); location.href = '/login';</script>");
 
-    var getUserByNo = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select * from users where no = ? ";
-
-            var queryResult = await conn.query(query, [no], async (err, rows) => {
-                resolve(rows[0]);
-            });
-
-        });
+        res.render('admin_user_modify', {user: user});
     };
 
-    var email = req.session.email;
-    if (await isAdmin(email)) {
-        res.render('admin_user_modify', {user: await getUserByNo(no)});
-    }
+    await main();
 
 });
 
 
 router.post('/user/:no/modify', async (req, res) => {
-    var no = Number(req.params.no);
-    var email = req.body.email;
-    var nickname = req.body.nickname;
-    var password = req.body.password;
-    var admin = 0;
 
-    if (req.body.admin)
-        admin = 1;
-
-    var userModifyWithoutPassword = async (no, email, nickname, admin) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "update users set email = ?, nickname = ?, admin = ? ";
-            query += "where no = ?";
-
-            var queryResult = await conn.query(query, [email, nickname, admin, no]);
-            resolve();
-
-        });
+    let updateUserWithoutPassword = async (user_no, email, nickname, admin) => {
+        return await userAPI.updateUserWithoutPassword(user_no, email, nickname, admin);
     };
 
-    var userModifyWithPassword = async (no, email, nickname, password, admin) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "update users set email = ?, password = ?, nickname = ?, admin = ? ";
-            query += "where no = ?";
-
-            var queryResult = await conn.query(query, [email, password, nickname, admin, no]);
-            resolve();
-
-        });
+    let updateUserWithPassword = async (user_no, email, password, nickname, admin) => {
+        return await userAPI.updateUserWithPassword(user_no, email, password, nickname, admin);
     };
 
 
-    var main = async () => {
+    let main = async () => {
+
+        let no = Number(req.params.no);
+        let email = req.body.email;
+        let nickname = req.body.nickname;
+        let password = req.body.password;
+        let admin = 0;
+
+        if (req.body.admin)
+            admin = 1;
+
         if (password) {
             password = lib.sha512(password);
-            await userModifyWithPassword(no, email, nickname, password, admin);
+            await updateUserWithPassword(no, email, password, nickname, admin);
         }
 
         else {
-            await userModifyWithoutPassword(no, email, nickname, admin);
+            await updateUserWithoutPassword(no, email, nickname, admin);
         }
 
         res.send(`<script>
                     alert('Modify success');
                     location.href = '/${__admin_path__}/user';
                 </script>`);
-    }
+    };
 
     await main();
 
