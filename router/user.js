@@ -59,8 +59,7 @@ router.get('/:no', async (req, res) => {
         let solvedChallenges = await getSolvedChallenges(user_no);
         let challenges = await getChallenegs();
         let nickname = await getNickname(user_no);
-
-        console.log({solvedChallenges: solvedChallenges, allChallenges: challenges, nickname: nickname});
+        
         res.render('./user_info', {solvedChallenges: solvedChallenges, allChallenges: challenges, nickname: nickname});
     };
 
