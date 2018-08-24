@@ -18,6 +18,7 @@ class ChallengeAPI {
     async getSolvedLog(chall_no, user_no) { return await API.Solvers.findOne({where: {challenge_no: chall_no, user_no: user_no}}) }
     async getCurrentChall() { return await API.Challenges.findOne({order: [['no', 'desc']], limit: 1}); }
     async deleteChall(chall_no) { return await API.Challenges.destroy({where: {no: chall_no}}) }
+    async getSolvedUsers(chall_no) { return await API.query("select * from solvers where challenge_no = :chall_no and (select admin from users where no = solvers.user_no) = 0", { replacements: { chall_no: chall_no}, type: Sequelize.QueryTypes.SELECT }); }
     async createChallenge(title, author, category, description, flag, hidden) {
         return await API.Challenges.create({title: title, author: author, category: category, description: description, flag: flag, hidden: hidden, point: 500 });
     }
