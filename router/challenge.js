@@ -10,7 +10,6 @@ const solversAPI = require('../api/solvers');
 const logAPI = require('../api/log');
 const FUNC = require('../api/function');
 
-
 let readDir = async (path, callback) => {
     await fs.readdir(path, async (err, files) => {
         if (err)
@@ -81,6 +80,8 @@ router.get('/:no', async (req, res) => {
 
     let getChallenge = async (no) => {
         let sqlData = await API.getByNo(no);
+        if (!sqlData)
+            return 0;
         return sqlData.dataValues;
     };
 
@@ -91,6 +92,8 @@ router.get('/:no', async (req, res) => {
 
         let no = Number(req.params.no);
         let challenge = await getChallenge(no);
+        if (!challenge)
+            return res.send("<script>alert('Invalid access detected'); history.back(); </script>");
 
         let path = `./public/uploads/${no}/`;
         challenge.files = await fs.readdirSync(path);
