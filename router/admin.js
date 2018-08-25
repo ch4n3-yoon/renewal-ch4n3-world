@@ -7,7 +7,6 @@ const conn = require("../dbconnect.js").conn;
 const config = require('../config/serverConfig');
 
 const API = require('../api/challenge');
-const FUNC = require('../api/function');
 const solversAPI = require('../api/solvers');
 const logAPI = require('../api/log');
 const userAPI = require('../api/user');
