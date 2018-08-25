@@ -26,6 +26,18 @@ exports.isLogin = (req, res) => {
     return 1;
 };
 
+exports.isAdmin = (req, res) => {
+    let admin = req.session.admin;
+    if (!admin) {
+        res.send(`<script>
+                    alert('Sorry, this paged requires admin permission');
+                    location.href = '/login';
+                </script>`);
+        return 0;
+    }
+    return 1;
+};
+
 exports.readDir = async (path) => {
     return await fs.readdirSync(path);
 };
