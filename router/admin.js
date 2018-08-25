@@ -11,6 +11,7 @@ const FUNC = require('../api/function');
 const solversAPI = require('../api/solvers');
 const logAPI = require('../api/log');
 const userAPI = require('../api/user');
+const FUNC = require('../api/function');
 
 const __admin_path__ = config.adminPath;
 
@@ -30,19 +31,16 @@ let isAdmin = async (user_no) => {
 router.get('/', async (req, res) => {
 
     let main = async () => {
-        let user_no = req.session.user_no;
-        if (await isAdmin(user_no))
-        {
-            res.render('admin');
-        }
 
-        else
-        {
-            res.send("<script>alert('you are not admin'); location.href='/login'; </script>");
-        }
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
+        res.render('admin');
     };
 
-    main();
+    await main();
 
 });
 
