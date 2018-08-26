@@ -231,50 +231,33 @@ router.get('/challenge/:no/realrudaganya', async (req, res) => {
 // todo
 router.get('/challenge/:no/delete', async (req, res) => {
 
-    let no = Number(req.params.no);
-
     // challenges 테이블에서 해당 chall을 삭제함.
-    let deleteChallenge = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var query = "delete from challenges where no = ? ";
-            var queryResult = await conn.query(query, [no]);
-
-            resolve();
-        });
+    let deleteChallenge = async (chall_no) => {
+        return await API.deleteChall(chall_no);
     };
 
     // solvers 테이블에서 해당 Solve Logs를 삭제함
-    var deleteSolveLog = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var query = "delete from solvers where solvedno = ? ";
-            var queryResult = await conn.query(query, [no]);
-
-            resolve();
-        });
+    let deleteSolveLog = async (chall_no) => {
+        return await solversAPI.removeSolveLog(chall_no);
     };
 
-    var main = async () => {
-        return new Promise(async () => {
+    let main = async () => {
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
-            if (!FUNC.isLogin(req, res))
-                return;
-            if (!FUNC.isAdmin(req, res))
-                return;
+        let chall_no = Number(req.params.no);
+        await deleteChallenge(chall_no);
+        await deleteSolveLog(chall_no);
 
-            await deleteChallenge(no);
-            await deleteSolveLog(no);
-
-            res.send(`<script>
+        res.send(`<script>
                         alert('Successfully deleted');
                         location.href = '/${__admin_path__}/challenge';
                     </script>`);
-
-            resolve();
-        });
     };
 
     await main();
-
 });
 
 
