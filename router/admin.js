@@ -228,7 +228,6 @@ router.get('/challenge/:no/realrudaganya', async (req, res) => {
 });
 
 // 문제 삭제 코드
-// todo
 router.get('/challenge/:no/delete', async (req, res) => {
 
     // challenges 테이블에서 해당 chall을 삭제함.
@@ -268,6 +267,11 @@ router.get('/challenge/:no/deletefile/:filename', async (req, res) => {
 
     let main = async () => {
 
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         FUNC.removeFile(chall_no, filename);
         res.send(`<script>
                         alert('File deleted successfully');
@@ -282,12 +286,12 @@ router.get('/challenge/:no/deletefile/:filename', async (req, res) => {
 router.get('/createChallenge', async (req, res) => {
 
     let main = async () => {
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('This page need root permission.'); location.href='/login'; </script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
-        else
-            return res.render('admin_chall_create');
+        res.render('admin_chall_create');
     };
 
     await main();
@@ -324,6 +328,12 @@ router.post('/createChallenge', async (req, res) => {
     };
 
     let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         let title = req.body.title;
         let category = req.body.category;
         let author = req.body.author;
@@ -385,9 +395,10 @@ router.get('/wrongkey', async (req, res) => {
 
     let main = async () => {
 
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
         let logs =  await getWrongAuthlog();
         res.render('admin_wrongkey', {logs: logs});
@@ -429,9 +440,10 @@ router.get('/correctkey', async (req, res) => {
 
     let main = async () => {
 
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
         let logs =  await getWrongAuthlog();
         res.render('admin_correctkey', {logs: logs});
@@ -478,9 +490,10 @@ router.get('/user', async (req, res) => {
 
     let main = async () => {
 
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('Sorry, this page requires admin permission'); location.href = '/login';</script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
         let users = await getUsers(setUsers);
         res.render('./admin_user_list', {users: users});
@@ -502,6 +515,12 @@ router.get('/user/:no', async (req, res) => {
     };
 
     let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         let user_no = Number(req.params.no);
         let user = await getUserByNo(user_no);
         if (!user)
@@ -527,6 +546,11 @@ router.post('/user/:no/modify', async (req, res) => {
 
 
     let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
         let no = Number(req.params.no);
         let email = req.body.email;
@@ -558,9 +582,16 @@ router.post('/user/:no/modify', async (req, res) => {
 
 // 정말로 사용자를 삭제하시겠습니까?
 router.get('/user/:no/realrudaganya', async (req, res) => {
-    var no = Number(req.params.no);
 
-    var code = `
+    let main = async () => {
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
+        let no = Number(req.params.no);
+
+        let code = `
         <script>
             var result = confirm('ㄹㅇ루 삭제하시겠습니까?');
             if (result) {
@@ -573,9 +604,10 @@ router.get('/user/:no/realrudaganya', async (req, res) => {
         </script>
     `;
 
-    res.send(code);
-    res.end();
+        res.send(code);
+    };
 
+    await main();
 });
 
 
@@ -628,7 +660,13 @@ router.get('/user/:no/delete', async (req, res) => {
         });
     };
 
-    var main = async () => {
+    let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         increaseSolvedChallengePoint(no);
         deleteUserByNo(no);
         res.send(`<script>
