@@ -81,9 +81,10 @@ router.get('/challenge', async (req, res) => {
 
     let main = async () => {
 
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('This page need your admin permission.'); location.href='/login';</script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
         let challenges = await getChallenges();
         let categorys = await getCategorys();
@@ -91,7 +92,7 @@ router.get('/challenge', async (req, res) => {
         res.render('./admin_chall_list', { 'challenges': challenges, 'categorys': categorys });
     };
 
-    main();
+    await main();
 
 });
 
@@ -109,9 +110,10 @@ router.get('/challenge/:chall_no', function(req, res) {
 
     let main = async () => {
 
-        let user_no = req.session.user_no;
-        if (!req.session.user_no || !await isAdmin(user_no))
-            return res.send("<script>alert('Sorry, this page need admin permission.'); location.href = '/login'; </script>");
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
 
         let chall_no = Number(req.params.chall_no);
@@ -160,6 +162,12 @@ router.post('/challenge/:challenge_no', async (req, res) => {
     };
 
     let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         let challenge_no = req.params.challenge_no;
         let path = `./public/uploads/${challenge_no}/`;
 
@@ -193,32 +201,15 @@ router.post('/challenge/:challenge_no', async (req, res) => {
 // 정말로 문제를 삭제하시겠습니까?
 router.get('/challenge/:no/realrudaganya', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
+    let main = async () => {
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
 
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
+        let no = Number(req.params.no);
 
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
-    };
-
-    var email = req.session.email;
-    await isAdmin(email);
-
-    var no = Number(req.params.no);
-
-    var code = `
+        res.send(`
         <script>
             alert('문제를 삭제하면 해당 문제를 푼 사용자의 점수가 깎입니다. 진행하시겠습니까?');
             var result = confirm('ㄹㅇ루 삭제하시겠습니까?');
@@ -230,43 +221,20 @@ router.get('/challenge/:no/realrudaganya', async (req, res) => {
                 history.back();
             }
         </script>
-    `;
+        `);
+    };
 
-    res.send(code);
-    res.end();
-
+    await main();
 });
 
 // 문제 삭제 코드
+// todo
 router.get('/challenge/:no/delete', async (req, res) => {
 
-    var isAdmin = async (email) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "select admin from users where email = ?";
-            var queryResult = await conn.query(query, [email], async (err, rows) => {
-
-                if (rows[0].admin !== 1) {
-                    res.send("<script>alert('You\\\'re not an administrator..'); location.href='/'; </script>");
-                    res.end();
-                    resolve(0);
-                }
-
-                else {
-                    resolve(1);
-                }
-            });
-
-        });
-    };
-
-    var email = req.session.email;
-    await isAdmin(email);
-
-    var no = Number(req.params.no);
+    let no = Number(req.params.no);
 
     // challenges 테이블에서 해당 chall을 삭제함.
-    var deleteChallenge = async (no) => {
+    let deleteChallenge = async (no) => {
         return new Promise(async (resolve, reject) => {
             var query = "delete from challenges where no = ? ";
             var queryResult = await conn.query(query, [no]);
@@ -287,6 +255,12 @@ router.get('/challenge/:no/delete', async (req, res) => {
 
     var main = async () => {
         return new Promise(async () => {
+
+            if (!FUNC.isLogin(req, res))
+                return;
+            if (!FUNC.isAdmin(req, res))
+                return;
+
             await deleteChallenge(no);
             await deleteSolveLog(no);
 
@@ -299,7 +273,7 @@ router.get('/challenge/:no/delete', async (req, res) => {
         });
     };
 
-    main()
+    await main();
 
 });
 
