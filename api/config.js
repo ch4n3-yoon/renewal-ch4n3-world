@@ -14,7 +14,7 @@ const API = new Sequelize(CONF.database, CONF.user, CONF.password, {
     operatorsAliases: false,
     timezone: '+09:00',
     logging: FUNC.log_sequelize,
-    charset  : 'utf8mb4'
+    charset: 'utf8mb4'
 });
 
 
