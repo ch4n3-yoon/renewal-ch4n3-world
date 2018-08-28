@@ -30,7 +30,7 @@ API.Users = API.define('users', {
     nickname: { type: Sequelize.TEXT('tiny'), allowNull: false },
     register_time: Sequelize.DATE,
     admin: { type: Sequelize.BOOLEAN, defaultValue: 0 },
-});
+},{charset: 'utf8',collate: 'utf8_unicode_ci'});
 
 
 API.Challenges = API.define('challenges', {
@@ -42,7 +42,7 @@ API.Challenges = API.define('challenges', {
     flag: { type: Sequelize.STRING, allowNull: false },
     point: { type: Sequelize.INTEGER, allowNull: false },
     hidden: { type: Sequelize.BOOLEAN, defaultValue: 0 },
-});
+},{charset: 'utf8',collate: 'utf8_unicode_ci'});
 
 
 API.Solvers = API.define('solvers', {
@@ -50,7 +50,7 @@ API.Solvers = API.define('solvers', {
     challenge_no: { type: Sequelize.INTEGER(10).UNSIGNED, allowNull: false },
     user_no: { type: Sequelize.INTEGER(10).UNSIGNED, allowNull: false },
     solve_time: Sequelize.DATE,
-});
+},{charset: 'utf8',collate: 'utf8_unicode_ci'});
 
 
 API.Authlog = API.define('authlog', {
@@ -60,7 +60,7 @@ API.Authlog = API.define('authlog', {
     user_flag: { type: Sequelize.STRING },
     state: { type: Sequelize.ENUM('CORRECT', 'WRONG', 'ALREADY SOLVED'), allowNull: false },
     try_time: Sequelize.DATE
-});
+},{charset: 'utf8',collate: 'utf8_unicode_ci'});
 
 API.sync();
 module.exports = API;
