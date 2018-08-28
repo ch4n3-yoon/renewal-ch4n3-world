@@ -11,6 +11,11 @@ const API = new Sequelize(CONF.database, CONF.user, CONF.password, {
         acquire: 30000,
         idle: 10000
     },
+    define: {
+        charset: 'utf8mb4_bin',
+        collate: 'utf8mb4_unicode_ci',
+        timestamps: true
+    },
     operatorsAliases: false,
     timezone: '+09:00',
     logging: FUNC.log_sequelize,
