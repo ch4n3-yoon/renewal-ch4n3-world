@@ -1,18 +1,14 @@
 const express = require("express");
 const path = require("path");
 const bodyParser = require('body-parser');
-const crypto = require('crypto');
 const conn = require("./dbconnect").conn;
-const lib = require("./lib");
 const fileUpload = require('express-fileupload');
-const fs = require("fs");
 const session = require('express-session');
 const schedule = require('node-schedule');
 
-const serverConfig = require('./config/serverConfig');
 
+const serverConfig = require('./config/serverConfig');
 const app = express();
-const route = express.Router();
 
 app.use(express.Router());
 
@@ -52,23 +48,30 @@ app.use('/rank', rank);
 app.use(`/${adminPath}`, admin);
 
 
-app.use( (req, res, next) => {
+app.use( async (req, res) => {
     res.render("404.pug", {url: req.url});
 });
 
 
-// Run the CTF server
-const server = app.listen(serverConfig.port, () => {
-    console.log("[*] nCTF Server started at port " + serverConfig.port);
-});
+if (serverConfig.isHttps) {
 
-// Do you want to use https?
-// var server = require('greenlock-express').create({
-//     version: 'v02',
-//     configDir: '/etc/letsencrypt',
-//     server: 'https://acme-v02.api.letsencrypt.org/directory',
-//     email: 'rtlzeromemory@nate.com',
-//     agreeTos: true,
-//     approveDomains: [ 'h3x0r.kr' ],
-//     app: app
-// }).listen(80, 443);
+    const server = require('greenlock-express').create({
+        version: 'v02',
+        configDir: 'YOUR_DIR',
+        server: 'https://acme-v02.api.letsencrypt.org/directory',
+        email: 'YOUR_EMAIL',
+        agreeTos: true,
+        approveDomains: [ 'YOUR_DOMAIN' ],
+        app: app
+    }).listen(serverConfig.port, 443);
+
+}
+
+else {
+
+    const server = app.listen(serverConfig.port, () => {
+        console.log("[*] nCTF Server started at port " + serverConfig.port);
+    });
+
+}
+
