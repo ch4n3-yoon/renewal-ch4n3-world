@@ -591,20 +591,16 @@ router.get('/user/:no/realrudaganya', async (req, res) => {
 
         let no = Number(req.params.no);
 
-        let code = `
-        <script>
-            var result = confirm('ㄹㅇ루 삭제하시겠습니까?');
-            if (result) {
-                location.href = '/${__admin_path__}/user/${no}/delete';
-            }
-
-            else {
-                history.back();
-            }
-        </script>
-    `;
-
-        res.send(code);
+        return res.send(`<script>
+                    let result = confirm('ㄹㅇ루 삭제하시겠습니까?');
+                    if (result) {
+                        location.href = '/${__admin_path__}/user/${no}/delete';
+                    }
+        
+                    else {
+                        history.back();
+                    }
+                </script>`);
     };
 
     await main();
