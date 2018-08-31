@@ -612,53 +612,32 @@ router.get('/user/:no/realrudaganya', async (req, res) => {
 
 
 router.get('/user/:no/delete', async (req, res) => {
-    var no = Number(req.params.no);
 
-    var deleteUserByNo = async (no) => {
-        return new Promise(async (resolve, reject) => {
-
-            var query = "delete from users where no = ?";
-            var queryResult = await conn.query(query, [no]);
-
-        });
+    let deleteUserByNo = async (user_no) => {
+        return await userAPI.deleteUser(user_no);
     };
 
-    var no2email = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var query = "select email from users where no = ?";
-            var queryResult = await conn.query(query, [no], (err, rows) => {
-                // 해당 사용자가 존재하지 않는 경우
-                if (rows.length === 0) {
-                    resolve(0);
-                }
-
-                else {
-                    resolve(rows[0].email);
-                }
-            });
-        });
-    }
-
-    var getSolvedChallenge = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var email = no2email(no);
-            var query = "select * from solvers where email = ?";
-            var queryResult = await conn.query(query, [email], (err, rows) => {
-                resolve
-            });
-        });
-    }
-
-    var increaseSolvedChallengePoint = async (no) => {
-        return new Promise(async (resolve, reject) => {
-            var solvedChallenges = getSolvedChallenge(no);
-            for (var i = 0; i < solvedChallenges.length; i++) {
-                var solvedno = solvedChallenges[i].solvedno;
-                var query = "update challenges set point = point + 10 where no = ?";
-                var queryResult = await conn.query(query, [solvedno]);
-            }
-        });
+    let getSolvedChallenges = async (user_no) => {
+        let sqlData = await solversAPI.getSolvedChalls(user_no);
+        let challenges = [];
+        for (let i = 0; i < sqlData.length; i++)
+            challenges.push(sqlData[i].dataValues);
+        return challenges;
     };
+
+    let deleteUserSolveLog = async (user_no) => {
+        return await solversAPI.deleteUserSolvedLog(user_no);
+    };
+
+    let setChallPoint = async (chall_no) => {
+        // int(round(min_score + (max_score - min_score) / (1 + (max(0, solves - 1) / 4.0467890) ** 3.84 )))
+        let solves = await API.getNumberOfSolver(chall_no);
+        let newPoint = Math.round(Math.round(10 + (500 - 10)) / Math.pow((1 + Math.max(0, solves - 1) / 4.0467890),2));
+        await API.setPoint(chall_no, newPoint);
+
+        return newPoint;
+    };
+
 
     let main = async () => {
 
@@ -667,16 +646,26 @@ router.get('/user/:no/delete', async (req, res) => {
         if (!FUNC.isAdmin(req, res))
             return;
 
-        increaseSolvedChallengePoint(no);
-        deleteUserByNo(no);
-        res.send(`<script>
+        let user_no = Number(req.params.no);
+        let solvedChalls = await getSolvedChallenges(user_no);
+
+        await deleteUserSolveLog();
+        await deleteUserByNo();
+
+        for (let i = 0; i < solvedChalls.length; i++)
+        {
+            let chall_no = solvedChalls[i].no;
+            await setChallPoint(chall_no);
+        }
+
+        return res.send(`<script>
                     alert('Successfully deleted.');
                     location.href = '/${__admin_path__}/user';
                 </script>`);
-        res.end();
+
     };
 
-    main();
+    await main();
 
 });
 
