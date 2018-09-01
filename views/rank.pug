@@ -35,16 +35,8 @@ html(lang="ko")
                                     td #{user.point}
                                 td #{user.lastsolvetime}
                             - rank++;
-                    P Make sure to keep all page content within the
-                        code #page-content-wrapper
-                        |.
-                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
 
         script(type="text/javascript")
-            | $("#menu-toggle").click(function(e) {
-            |  e.preventDefault();
-            |  $("#wrapper").toggleClass("toggled");
-            | });
-            |
+            | $("#wrapper").toggleClass("toggled");
             | setTimeout("location.reload()",10000);
 
