@@ -16,16 +16,12 @@ html(lang="ko")
                 .container-fluid
                     h1 Hackingcamp CTF
                     p 이 사이트는 데몬팀의 ch4n3이 갈리고 갈려서 만들어지게 된 사이트입니다. 보신다면 R.I.P를 댓글로 남겨주세요
-                    p 만약 해당 프레임워크가 맘에 드시면
+                    p 만약 해당 프레임워크가 맘에 드시면&nbsp;
                         a(href="https://github.com/ch4n3-yoon/nCTF") 여기
                         | 에 스타 좀 눌러주세요. (팔로우 감사합니다)
-                    p Welcome to
+                    p Welcome to&nbsp;
                         code #Hackingcamp
                         |!!
-                    a(href="#menu-toggle", class="btn btn-secondary", id="menu-toggle") Toggle Menu
                               
         script(type="text/javascript")
-            | $("#menu-toggle").click(function(e) {
-            |  e.preventDefault();
-            |  $("#wrapper").toggleClass("toggled");
-            | });
+            | $("#wrapper").toggleClass("toggled");
