@@ -4,6 +4,8 @@ const router = express.Router();
 const lib = require('../lib.js');
 const conn = require("../dbconnect.js").conn;
 
+const adminPath = require('../config/serverConfig').adminPath;
+
 // 랭킹 페이지
 // 2018.06.06 17:18 정상 작동 확인
 router.get('/', async (req, res) => {
@@ -56,7 +58,7 @@ router.get('/', async (req, res) => {
         let users = await getUsers();
         users = await setUsers(users);
 
-        res.render('./rank', {users: users, isLogin: isLogin(), session: req.session});
+        res.render('./rank', {users: users, isLogin: isLogin(), session: req.session, adminPath: adminPath});
     };
 
     await main();
