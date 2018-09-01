@@ -78,30 +78,55 @@ router.get('/register', function(req, res) {
 
 router.post('/register', async (req, res) => {
 
-    if (req.body.pw !== req.body.re_pw) {
-        return res.send(`<script>
+    let main = async () => {
+
+        if (req.body.pw !== req.body.re_pw) {
+            return res.send(`<script>
                     alert('Your two passwords are different.');
                     history.back();
                 </script>`);
-    }
+        }
 
-    let email = req.body.email.trim();
-    let nickname = req.body.nickname.trim();
-    let password = lib.sha512(req.body.pw);
+        let email = req.body.email.trim();
+        let nickname = req.body.nickname.trim();
+        let password = lib.sha512(req.body.pw);
 
 
-    if (await API.isUserInfoExist(email, nickname)) {
-        res.send(`<script>
+        if (await API.isUserInfoExist(email, nickname)) {
+            res.send(`<script>
                       alert('username or nickname is already exist');
                       history.back();
                   </script>`);
-    } else {
-        await API.createUser(email, password, nickname);
-        res.send(`<script>
+        }
+
+
+        else {
+            await API.createUser(email, password, nickname);
+
+            let sess = req.session;
+
+            let result = await API.login(email, password);
+            if (result) {
+                result = result.dataValues;
+
+                sess.user_no = result.no;
+                sess.email = result.email;
+                sess.nickname = result.nickname;
+                sess.register_time = result.register_time;
+                sess.admin = result.admin;
+
+                sess.save();
+            }
+
+            return res.send(`<script>
                       alert("register ok");
                       location.href = '/';
                   </script>`);
-    }
+        }
+
+    };
+
+    await main();
 
 });
 
