@@ -13,6 +13,7 @@ class UserAPI {
     async getNicknameByNo(no) { return await API.Users.findOne({attributes: ['nickname'], where: {no: no}}) }
     async isUserInfoExist(email, nickname) { return await API.Users.count({where: { [Op.or]: [{email: email, nickname: nickname}]} }) }
     async isAdmin(user_no) { return await API.Users.findOne({attributes: ['admin'], where: {no: user_no}}) }
+    async deleteUser(user_no) { return await API.Users.destroy({where: {no: user_no}}) }
 
     async createUser(email, password, nickname) {
         return await API.Users.create({email: email, password: password, nickname: nickname, register_time: Sequelize.fn('now')});
@@ -25,6 +26,7 @@ class UserAPI {
     async updateUserWithPassword(user_no, email, password, nickname, admin) {
         return await API.Users.update({email: email, password: password, nickname: nickname, admin: admin}, {where: {no: user_no}});
     }
+
 }
 
 module.exports = new UserAPI();

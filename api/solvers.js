@@ -9,6 +9,7 @@ class ChallengeAPI {
     async getSolvedChalls(user_no) { return await API.Solvers.findAll({where: {user_no: user_no}}) }
     async getSolvedRank(chall_no, solve_time) { return await API.Solvers.count({where: {challenge_no: chall_no, solve_time: {[Op.lte]: solve_time}}}) }
     async getSolvedTime(chall_no, user_no) { return await API.Solvers.findOne({attributes: ['solve_time'], where: {challenge_no: chall_no, user_no: user_no}}) }
+    async deleteUserSolvedLog(user_no) { return await API.Solvers.destroy({where: {user_no: user_no}}) }
     async addSolver(challenge_no, user_no) {
         return await API.Solvers.create({challenge_no: challenge_no, user_no: user_no, solve_time: Sequelize.fn('now')});
     }

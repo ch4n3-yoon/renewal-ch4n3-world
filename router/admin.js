@@ -665,4 +665,11 @@ router.get('/user/:no/delete', async (req, res) => {
 
 });
 
+
+router.get('/serverSetting', async (req, res) => {
+
+    
+
+});
+
 module.exports = router;
