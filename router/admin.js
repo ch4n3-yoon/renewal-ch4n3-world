@@ -1,5 +1,7 @@
 const express = require('express');
 const fs = require('fs');
+const os = require('os');
+
 const router = express.Router();
 
 const lib = require('../lib.js');
@@ -41,6 +43,22 @@ router.get('/', async (req, res) => {
 
     await main();
 
+});
+
+router.get('/serverInfo', async (req, res) => {
+    let main = async () => {
+        let js_version = process.version;
+        let os_name = os.platform();
+        let os_version = os.release();
+
+        let offset= -(new Date()).getTimezoneOffset();
+        let timezone = (offset>=0 ? '+':'-') + parseInt(offset/60) + ':' + offset%60;
+
+
+        return res.render('admin/server_information', {os: os_name, os_version:os_version, js_version: js_version, timezone: timezone});
+    };
+
+    await main();
 });
 
 
