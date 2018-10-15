@@ -1,9 +1,10 @@
 .git
 .vscode
 node_modules
-uploads
-config/*
+public/uploads
+config
 .gitignore
 .idea
 tmp
 logs
+router/logs
