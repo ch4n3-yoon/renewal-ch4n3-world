@@ -47,6 +47,12 @@ router.get('/', async (req, res) => {
 
 router.get('/serverInfo', async (req, res) => {
     let main = async () => {
+
+        if (!FUNC.isLogin(req, res))
+            return;
+        if (!FUNC.isAdmin(req, res))
+            return;
+
         let js_version = process.version;
         let os_name = os.platform();
         let os_version = os.release();
