@@ -1,0 +1,61 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        meta(name="author", content="ch4n3")
+        title Hackingcamp CTF
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://cdn.jsdelivr.net/npm/startbootstrap-simple-sidebar@4.1.1/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js")
+    body
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+            .container
+                a.navbar-brand(href="/") Hackingcamp CTF
+                button.navbar-toggler(type="button",data-toggle="collapse",data-target="#navbarResponsive",aria-controls="navbarResponsive",aria-expanded="false",aria-label="Toggle navigation")
+                    span.navbar-toggler-icon
+                div#navbarResponsive.collapse.navbar-collapse
+                    ul.navbar-nav.ml-auto
+                        li.nav-item.active
+                            a.nav-link(href="/challenge") Home
+                                span.sr-only (current)
+                        each category in categorys
+                            li.nav-item
+                                a.nav-link(href="#" + category) #{category}
+        
+        div.container
+
+
+            each category in categorys
+                div#pwn.card.text-white.bg-secondary.my-4.text-center
+                    div(id=category)
+                        div.card-body
+                            p.text-white.m-0 
+                                h2 #{category}
+                    
+                div.row
+                    each challenge in challenges
+                        if challenge.category == category
+                                div.div.col-md-4.mb-4
+                                    div.card.h-100
+                                        div.card-body
+                                            h2.card-title #{challenge.title}
+                                            p.card-text 
+                                                | author : #{challenge.author}
+                                                br
+                                                | point : #{challenge.point}
+                                                br
+                                                | solvers : #{challenge.solvers}
+                                        div.card-footer
+                                            a.btn.btn-primary(href=`/${__admin_path__}/challenge/` + challenge.no) Modify
+                    br                   
+            br
+            div.div.row
+                a.btn.btn-info(href=`/${__admin_path__}/createChallenge`, role="button")
+                    | Create Challenge
+            br
+
+        footer.py-5.bg-dark
+            div.container
+                p.m-0.text-center.text-white Copyright &copy; ch4n3 2018
+                

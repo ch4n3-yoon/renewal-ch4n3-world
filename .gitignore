@@ -1,0 +1,10 @@
+.pm2/
+log/
+logs/
+router/logs/
+node_modules/
+api/logs/
+.git/
+app.log
+.idea/
+public/uploads/

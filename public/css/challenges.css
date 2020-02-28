@@ -1,0 +1,75 @@
+body {
+    font-family: 'Ubuntu', sans-serif, 'Nanum Gothic Coding', monospace;
+}
+
+.contianer {
+    width: 60%;
+    margin: 0 auto;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.content {
+    width: 60%;
+}
+
+.header {
+    font-weight: bold;
+    text-align: center;
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+}
+
+.menu {
+    list-style-type: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    display: inline-block;
+    padding: 1em;
+}
+
+.block {
+    margin-bottom: 2em;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.inline-block {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.title {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.flag-auth {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.challenge {
+    margin-top: 1em;
+}
+
+.list-inline {
+    padding-left: 0;
+    list-style: none;
+}
+
+.list-inline-item {
+    display: inline-block;
+}
+
+.solved {
+    background: #5cffb3;
+}

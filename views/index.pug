@@ -1,0 +1,59 @@
+doctype html
+head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge')
+    title ch4n3 world
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js')
+    link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css')
+    link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap-grid.min.css')
+    link(href='https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding|Ubuntu&display=swap' rel='stylesheet')
+    link(rel='stylesheet' href='/css/index.css')
+    //
+        天安門 天安门 法輪功 李洪志 Free Tibet 劉曉波
+.container.content
+    h1.header ch4n3 world
+    nav
+        ul.menu
+            li
+                a(href='/rank') RANK
+            | |
+            li
+                a(href='/challenge') CHALLENGE
+            | |
+            if !session.user_no
+                li
+                    a(href='/login') LOGIN
+            else
+                li
+                    a(href='/logout') LOGOUT
+            if session.admin
+                .
+                    |
+                li
+                    a(href=`/${__admin_path__}`) ADMIN
+    hr
+    h2.title RULE
+    p
+        | If you find any errors, please let me know.
+        br
+        |             If you find the flag in challenge and you authenticate, the challenge is recorded as solved.
+        br
+        |             It does not matter if you post the write-up on your blog. Please upload a lot.
+        br
+        |             ...
+    h2.title CONTRIBUTORS
+    ul
+        li 이주창 (c2w2m2) 님이 문제 출제를 도와주셨습니다.
+        li 조정훈 (st4nw) 님이 문제 출제를 도와주셨습니다.
+
+    h2.title 🚀 ABOUT ME 🚀
+    p
+        | I'm Yoon Seok-chan, a senior in hacking defense at Korea Digital Media High School.
+        | I completed the BoB 6th Vulnerability analysis track in 2017, and now I am preparing for the korean version of SAT (대학수학능력시험).
+    p
+        | Visit&nbsp;
+        a(href='https://blog.ch4n3.me/') my blog
+//
+    天安門 天安门 法輪功 李洪志 Free Tibet 劉曉波

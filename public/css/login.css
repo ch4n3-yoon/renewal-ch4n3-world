@@ -1,0 +1,26 @@
+
+html,body {
+    height: 100%;
+}
+body {
+    display: table;
+    margin: 0 auto;
+}
+.container {
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+}
+center {
+    height: 50px;
+    width: 50px;
+    background-color: black;
+}
+.header {
+    margin-top: 100em;
+    margin: 0 auto;
+    text-align: center;
+}
+h1 {
+    font-weight: bold;
+}

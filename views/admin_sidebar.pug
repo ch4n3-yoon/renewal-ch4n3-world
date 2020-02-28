@@ -1,0 +1,23 @@
+#sidebar-wrapper 
+    ul.sidebar-nav
+        li.sidebar-brand
+            a(href="/") Hackingcamp CTF
+        li
+            a(href="/rank") Ranking
+        
+        li 
+            a(href="/secretjuju/correctkey") Correct Submission
+        li 
+            a(href="/secretjuju/wrongkey") Wrong Submission
+        li 
+            a(href="/secretjuju/user") Users Modification
+        li
+            a(href="/secretjuju/challenge") Challenges
+        
+        //- 로그인하지 않았을 때
+        if isLogin == 0
+            li
+                a(href="/login") Login & Register
+        else 
+            li 
+                a(href="/logout") Logout

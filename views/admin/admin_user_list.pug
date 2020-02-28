@@ -1,0 +1,40 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title Hackingcamp CTF
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://cdn.jsdelivr.net/npm/startbootstrap-simple-sidebar@4.1.1/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            include admin_sidebar.pug
+
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 ch4n3 world User Modification
+                    P 유저에 걸려있는 하이퍼링크를 누르면 유저 관리 페이지로 넘어갑니다.
+                    table.table
+                        tr
+                            th #
+                            th nickname
+                            th point 
+                            th Last Solve Time
+
+                        - var rank = 1;
+                        each user in users
+                            tr
+                                td #{rank}
+                                td 
+                                    a(href=`/${__admin_path__}/user/${user.no}`) #{user.nickname}
+                                if user.point == null
+                                    td 0
+                                else 
+                                    td #{user.point}
+                                td #{user.lastsolvetime}
+                            - rank++;
+                              
+        script(type="text/javascript")
+            | $("#wrapper").toggleClass("toggled");

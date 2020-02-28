@@ -1,0 +1,40 @@
+
+/* Made by ch4n3 */
+
+.navigation-ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #333333;
+    overflow: hidden;
+}
+
+.navigation-li {
+    float: left;
+}
+
+.navigation-li a {
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    padding: 1em 1em;
+}
+
+.navigation-li a:hover {
+    background-color: #111;
+}
+
+.menu:hover {
+    background-color: #111;
+    color: white;
+    text-decoration: none;
+}
+
+.active {
+    background-color: #4CAF50;
+}
+
+.active:hover {
+    background-color: #4CAF50;
+}

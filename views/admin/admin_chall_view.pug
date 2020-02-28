@@ -1,0 +1,87 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title Hackingcamp CTF
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://cdn.jsdelivr.net/npm/startbootstrap-simple-sidebar@4.1.1/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js")
+        style
+            include admin_chall_view.css
+    body
+        .container 
+
+            h1 ch4n3 world admin
+            br
+            br
+            div.hr-sect PREVIEW
+
+            h3 #{challenge.title}
+            pre !{challenge.description}
+        
+
+            div.hr
+
+            br
+            br
+            br
+
+            form(action=`/${__admin_path__}/challenge/${challenge.no}`, method="post", enctype="multipart/form-data")
+                div.form-group
+                    label Title
+                    input.form-control(type="text", value=challenge.title, name="title")
+                div.form-group
+                    lable Category
+                    select.form-control(name="category")
+                        option #{challenge.category}
+                        option Pwnable
+                        option Reversing
+                        option Webhacking
+                        option Misc
+
+                div.form-group
+                    label Description
+                    textarea.form-control(rows="6", name="description")= challenge.description
+                div.form-group
+                    label Flag
+                    input.form-control(type="text", value=challenge.flag, name="flag")
+                .form-group
+                    lable Point
+                    input.form-control(type="number", value=challenge.point, name="point")
+                div.form-group
+                    if challenge.hidden == 1
+                        input(type="checkbox", class="form-check-input", name="hidden", checked)
+                    else 
+                        input(type="checkbox", class="form-check-input", name="hidden")
+                    label hidden
+                br
+                div.form-group
+                    label Files
+                    each file in challenge.files
+                        p #{file} (path : /uploads/#{challenge.no}/#{file})
+                            a(href="/secretjuju/challenge/"+challenge.no+"/deletefile/" + file) &nbsp;파일 삭제
+                
+                div.form-group
+                    label Upload file
+                    div#files
+                        input.form-control(type='file', name='file[]')
+                    br
+                    button#addfile.btn.btn-secondary(type="button") add file
+                
+                br
+                br
+                div.row
+                    .col-sm-1
+                        button.btn.btn-primary.mb-2 Modify
+                    .col-sm-1
+                        a.btn.btn-info.mb-2(href=`/${__admin_path__}/challenge`) List
+                    .col-sm-1
+                        a.btn.btn-danger.mb-2(href=`/${__admin_path__}/challenge/${challenge.no}/realrudaganya`) Delete
+            br
+            br
+
+        script(type="text/javascript")
+            include admin_chall_create.js
+            
+        

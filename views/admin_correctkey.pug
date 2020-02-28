@@ -1,0 +1,38 @@
+doctype html
+html(lang="ko")
+    head 
+        meta(charset="utf-8")
+        title hackingcamp CTF
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css", rel="stylesheet")
+        link(href="https://cdn.jsdelivr.net/npm/startbootstrap-simple-sidebar@4.1.1/css/simple-sidebar.css", rel="stylesheet")
+        script(src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js")
+    body
+        #wrapper
+            include admin_sidebar.pug
+
+
+            #page-content-wrapper
+                .container-fluid
+                    h1 Hackingcamp CTF Correct Submissions
+                    P 맞은 플래그들을 모아두엇습니다. 
+                    table.table
+                        tr
+                            th ID
+                            th Team
+                            th Challenge 
+                            th Submission
+                            th Time
+
+                        each log in logs
+                            tr
+                                td #{log.no}
+                                td 
+                                    a(href='/user/' + log.user_no) #{log.nickname}
+                                td #{log.title}
+                                td #{log.user_flag}
+                                td #{log.try_time}
+
+                              
+        script(type="text/javascript")
+            | $("#wrapper").toggleClass("toggled");
