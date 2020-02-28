@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "ch4n3-yoon <ch4n3.yoon@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "auto-sni": "^2.3.2",
@@ -31,6 +31,8 @@
     "pg-hstore": "^2.3.2",
     "pug": "^2.0.3",
     "sequelize": "^4.44.3",
-    "supervisor": "^0.12.0"
-  }
+    "supervisor": "^0.12.0",
+    "yarn": "^1.22.0"
+  },
+  "repository": "https://github.com/ch4n3-yoon/renewal-ch4n3-world.git"
 }
