@@ -83,39 +83,4 @@ module.exports = {
         });
     },
 
-    // email과 nickname이 이미 존재하는지 확인하는 코드
-    isUserInfoExist: (email, nickname, fn) => {
-
-        var query = "select * from users where email = ? or nickname = ?";
-        var sqlResult = conn.query(query, [email, nickname], (err, rows) => {
-
-            // 중복된 계정 존재
-            if (rows.length != 0) {
-                fn(1);
-            }
-
-            fn(0);
-        });
-
-    },
-
-    insertUser: (email, nickname, password) => {
-        var query = "insert into users (email, nickname, password, registertime) "
-        query += "values (?, ?, ?, now())";
-        conn.query(query, [email, nickname, password], (err, rows) => {
-            console.log("[+] " + nickname + " has inserted.");
-        });
-    },
-
-    // 로그인에 사용되는 함수
-    login: (email, password, fn) => {
-        var query = "select * from users where email = ? and password = ? ";
-        var sqlResult = conn.query(query, [email, password], (err, rows) => {
-            if (rows.length === 0)
-                fn(0);
-            else
-                fn(rows[0]);
-        });
-    }
-
 };
