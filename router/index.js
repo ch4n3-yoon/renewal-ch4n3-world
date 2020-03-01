@@ -12,6 +12,8 @@ const ChallengeAPI = require('../api/challenge');
 const SolversAPI = require('../api/Solvers');
 const LogAPI = require('../api/log');
 
+const userService = require('../services/userService');
+
 
 let login = async (email, password) => {
     let sqlData = await API.login(email, password);
@@ -83,53 +85,15 @@ router.get('/register', function(req, res) {
 
 router.post('/register', async (req, res) => {
 
-    let main = async () => {
+    let status = await userService.Signup(req.body);
+    const userModel = status.userModel;
 
-        if (req.body.password.length < 6) {
-            let message = lib.setMessage("Password must be at least 6 digits.", 'back');
-            return res.send(message);
-        }
+    if (status.error) {
+        // TODO: logger 사용해서 에러 로그 남기기
+    }
 
-        let email = req.body.email.trim();
-        let nickname = req.body.nickname.trim();
-        let password = lib.sha512(req.body.password);
+    res.send(lib.setMessage(status.message, 'back'));
 
-        if (await API.isUserEmailAlreadyExist(email) > 0) {
-            let message = lib.setMessage("Duplicated email", '/register');
-            return res.send(message);
-        }
-
-        else if (await API.isUserNicknameAlreadyExist(nickname) > 0) {
-            let message = lib.setMessage("Duplicated nickname", '/register');
-            return res.send(message);
-        }
-
-        else {
-            await register(email, password, nickname);
-
-            let result = await login(email, password);
-            if (result) {
-
-                let session = req.session;
-                session.user_no = result.no;
-                session.email = result.email;
-                session.nickname = result.nickname;
-                session.admin = result.admin;
-
-                session.save();
-
-                let message = lib.setMessage("You have successfully signed up.", '/login');
-                return res.send(message);
-            }
-
-            else {
-                let message = lib.setMessage("Database Error.", 'back');
-                return res.send(message);
-            }
-        }
-    };
-
-    await main();
 });
 
 router.post('/auth', async (req, res) => {
