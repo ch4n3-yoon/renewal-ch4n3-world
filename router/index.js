@@ -39,39 +39,12 @@ router.get('/login', function(req, res) {
 
 router.post('/login', async (req, res) => {
 
-    let main = async () => {
+    let status = await userService.Signin(req.body, req.session);
+    if (status.error) {
+        return res.send(lib.setMessage(status.message, 'back'));
+    }
 
-        let session = req.session;
-        let email = req.body.email;
-        let password = req.body.password;
-
-        if (!email || !password) {
-            let message = lib.setMessage("Please fill in all fields.", '/login');
-            return res.send(message);
-        }
-
-        else {
-            password = lib.sha512(password);
-        }
-
-        let result = await login(email, password);
-        if (!result) {
-            let message = lib.setMessage("Login failed.", '/login');
-            return res.send(message);
-        }
-
-        else {
-            session.user_no = result.no;
-            session.email = result.email;
-            session.nickname = result.nickname;
-            session.admin = result.admin;
-            session.save();
-
-            res.redirect('/challenge');
-        }
-    };
-
-    await main();
+    res.redirect('/challenge');
 });
 
 router.get('/logout', function(req, res) {

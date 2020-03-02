@@ -126,6 +126,29 @@ class UserService {
 
         return status;
     }
+
+    static async Signin(userDTO, userSession) {
+
+        let status = {error: false};
+
+        let hashed_password = sha512(userDTO.password);
+        let result = await this.login(userDTO.email, hashed_password);
+        if (!result) {
+            status.error = true;
+            status.message = 'Login failed';
+            return status;
+        }
+
+        status.userModel = result;
+
+        userSession.user_no = result.no;
+        userSession.email = result.email;
+        userSession.nickname = result.nickname;
+        userSession.admin = result.admin;
+        userSession.save();
+
+        return status;
+    }
 }
 
 module.exports = UserService;
