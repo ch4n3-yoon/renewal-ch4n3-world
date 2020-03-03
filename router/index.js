@@ -14,24 +14,14 @@ const LogAPI = require('../api/log');
 
 const userService = require('../services/userService');
 
-
-let login = async (email, password) => {
-    let sqlData = await API.login(email, password);
-    if (sqlData)
-        return sqlData.dataValues;
-    return 0;
-};
-
-
-let register = async (email, password, nickname) => {
-    await API.createUser(email, password, nickname);
-};
-
+router.use(function(req, res, next) {
+    req.isUserSignedIn = !!req.session.email;
+    next();
+});
 
 router.get('/', function(req, res) {
     res.render('index', {session: req.session, __admin_path__: __admin_path__});
 });
-
 
 router.get('/login', function(req, res) {
     res.render('login.pug');
@@ -48,7 +38,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/logout', function(req, res) {
-    req.session.destroy();
+    req.session.destroy();k
     res.redirect('/');
 });
 
@@ -92,7 +82,7 @@ router.post('/auth', async (req, res) => {
 
     let main = async () => {
 
-        if (!req.session.email)
+        if (!req.isUserSignedIn)
             return res.json({status: 'not signed in'});
 
         let user_flag = req.body.flag;
