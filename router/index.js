@@ -13,6 +13,8 @@ const SolversAPI = require('../api/Solvers');
 const LogAPI = require('../api/log');
 
 const userService = require('../services/userService');
+const challengeService = require('../services/challengeService');
+let userModel;
 
 router.use(function(req, res, next) {
     req.isUserSignedIn = !!req.session.email;
@@ -33,6 +35,7 @@ router.post('/login', async (req, res) => {
     if (status.error) {
         return res.send(lib.setMessage(status.message, 'back'));
     }
+    userModel = status.userModel;
 
     res.redirect('/challenge');
 });
@@ -49,7 +52,7 @@ router.get('/register', function(req, res) {
 router.post('/register', async (req, res) => {
 
     let status = await userService.Signup(req.body);
-    const userModel = status.userModel;
+    userModel = status.userModel;
 
     if (status.error) {
         // TODO: logger 사용해서 에러 로그 남기기
@@ -60,6 +63,7 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/auth', async (req, res) => {
+
     let getChallengeByFlag = async (flag) => {
         let sqlData = await ChallengeAPI.getChallengeByFlag(flag);
         if (sqlData)
